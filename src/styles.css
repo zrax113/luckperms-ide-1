@@ -37,45 +37,44 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
-  --color-neon: var(--neon);
+  --color-accent-green: var(--accent-green);
 }
 
 :root, .dark {
   --radius: 0.5rem;
-  /* Neon-green IDE palette */
-  --background: oklch(0.16 0.02 150);
-  --foreground: oklch(0.96 0.02 150);
-  --titlebar: oklch(0.13 0.025 150);
-  --sidebar-bg: oklch(0.14 0.025 150);
-  --panel: oklch(0.18 0.03 150);
-  --card: oklch(0.20 0.035 150);
-  --card-foreground: oklch(0.96 0.02 150);
-  --popover: oklch(0.18 0.03 150);
-  --popover-foreground: oklch(0.96 0.02 150);
-  --primary: oklch(0.85 0.25 145);
-  --primary-foreground: oklch(0.12 0.04 150);
-  --secondary: oklch(0.26 0.04 150);
-  --secondary-foreground: oklch(0.96 0.02 150);
-  --muted: oklch(0.22 0.03 150);
-  --muted-foreground: oklch(0.68 0.05 145);
-  --accent: oklch(0.30 0.06 150);
-  --accent-foreground: oklch(0.98 0.02 150);
-  --destructive: oklch(0.68 0.24 25);
+  /* Modern minimal — soft graphite with subtle green accent */
+  --background: oklch(0.155 0.005 250);
+  --foreground: oklch(0.96 0.005 250);
+  --titlebar: oklch(0.135 0.005 250);
+  --sidebar-bg: oklch(0.145 0.005 250);
+  --panel: oklch(0.175 0.006 250);
+  --card: oklch(0.195 0.006 250);
+  --card-foreground: oklch(0.96 0.005 250);
+  --popover: oklch(0.18 0.006 250);
+  --popover-foreground: oklch(0.96 0.005 250);
+  --primary: oklch(0.78 0.18 150);
+  --primary-foreground: oklch(0.12 0.02 150);
+  --secondary: oklch(0.24 0.006 250);
+  --secondary-foreground: oklch(0.96 0.005 250);
+  --muted: oklch(0.22 0.006 250);
+  --muted-foreground: oklch(0.62 0.01 250);
+  --accent: oklch(0.26 0.008 250);
+  --accent-foreground: oklch(0.98 0.005 250);
+  --destructive: oklch(0.66 0.22 25);
   --destructive-foreground: oklch(0.98 0.005 0);
-  --success: oklch(0.85 0.25 145);
-  --warning: oklch(0.82 0.18 90);
-  --info: oklch(0.78 0.16 200);
-  --border: oklch(0.28 0.04 150);
-  --input: oklch(0.22 0.03 150);
-  --ring: oklch(0.85 0.25 145);
-  --neon: oklch(0.88 0.28 142);
+  --success: oklch(0.78 0.18 150);
+  --warning: oklch(0.82 0.16 80);
+  --info: oklch(0.74 0.13 230);
+  --border: oklch(0.26 0.005 250);
+  --input: oklch(0.20 0.006 250);
+  --ring: oklch(0.78 0.18 150);
+  --accent-green: oklch(0.82 0.20 145);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.88 0.28 142), oklch(0.78 0.22 175));
-  --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.85 0.25 145 / 0.20), transparent 70%);
-  --shadow-glow: 0 0 32px -4px oklch(0.85 0.25 145 / 0.55);
-  --shadow-neon-sm: 0 0 12px oklch(0.85 0.25 145 / 0.4);
-  --shadow-neon-lg: 0 0 40px oklch(0.85 0.25 145 / 0.6);
-  --shadow-panel: 0 4px 30px -10px oklch(0 0 0 / 0.5);
+  --gradient-glint: linear-gradient(135deg, oklch(0.78 0.18 150 / 0.18), transparent 60%);
+  --shadow-glint: 0 0 18px -2px oklch(0.78 0.18 150 / 0.35);
+  --shadow-glint-soft: 0 0 0 1px oklch(0.78 0.18 150 / 0.3), 0 8px 24px -8px oklch(0.78 0.18 150 / 0.25);
+  --shadow-panel: 0 12px 40px -12px oklch(0 0 0 / 0.6);
+  --shadow-elevated: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px -10px oklch(0 0 0 / 0.5);
 }
 
 @layer base {
@@ -88,51 +87,56 @@
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     background-image:
-      radial-gradient(circle at 0% 0%, oklch(0.85 0.25 145 / 0.08), transparent 45%),
-      radial-gradient(circle at 100% 100%, oklch(0.78 0.22 175 / 0.06), transparent 45%),
-      linear-gradient(to bottom, transparent, oklch(0.10 0.02 150 / 0.4));
+      radial-gradient(ellipse 60% 40% at 50% -10%, oklch(0.78 0.18 150 / 0.06), transparent 70%),
+      radial-gradient(circle at 100% 100%, oklch(0.74 0.13 230 / 0.04), transparent 50%);
   }
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: oklch(0.30 0.04 150); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--neon); background-clip: padding-box; border: 2px solid transparent; }
+  ::-webkit-scrollbar-thumb { background: oklch(0.28 0.005 250); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: oklch(0.40 0.01 250); background-clip: padding-box; border: 2px solid transparent; }
 }
 
 @layer utilities {
-  .glass { background: color-mix(in oklab, var(--panel) 75%, transparent); backdrop-filter: blur(16px) saturate(160%); }
-  .glow-neon { box-shadow: var(--shadow-neon-sm); }
-  .glow-neon-lg { box-shadow: var(--shadow-neon-lg); }
-  .text-neon { color: var(--neon); text-shadow: 0 0 12px oklch(0.85 0.25 145 / 0.7); }
-  .gradient-primary { background: var(--gradient-primary); }
-  .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .glass { background: color-mix(in oklab, var(--panel) 80%, transparent); backdrop-filter: blur(18px) saturate(150%); }
+  .glow-green { box-shadow: var(--shadow-glint); }
+  .glow-green-soft { box-shadow: var(--shadow-glint-soft); }
+  .text-green { color: var(--accent-green); }
+  .text-glow { text-shadow: 0 0 14px oklch(0.78 0.18 150 / 0.5); }
+  .gradient-text { background: linear-gradient(135deg, oklch(0.96 0.005 250), oklch(0.78 0.18 150)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .grid-bg {
     background-image:
-      linear-gradient(oklch(0.85 0.25 145 / 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(0.85 0.25 145 / 0.04) 1px, transparent 1px);
-    background-size: 32px 32px;
+      linear-gradient(oklch(0.78 0.18 150 / 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.78 0.18 150 / 0.025) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 90%);
   }
-  .glint { position: relative; overflow: hidden; }
+  .glint { position: relative; overflow: hidden; isolation: isolate; }
   .glint::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(115deg, transparent 30%, oklch(0.85 0.25 145 / 0.18) 50%, transparent 70%);
-    transform: translateX(-100%); transition: transform 0.9s ease; pointer-events: none;
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(115deg, transparent 35%, oklch(0.78 0.18 150 / 0.16) 50%, transparent 65%);
+    transform: translateX(-100%); transition: transform 0.85s ease;
   }
   .glint:hover::after { transform: translateX(100%); }
-  @keyframes neon-pulse {
-    0%, 100% { box-shadow: 0 0 16px oklch(0.85 0.25 145 / 0.4), 0 0 32px oklch(0.85 0.25 145 / 0.2); }
-    50% { box-shadow: 0 0 24px oklch(0.85 0.25 145 / 0.7), 0 0 48px oklch(0.85 0.25 145 / 0.4); }
+  .ring-green { box-shadow: 0 0 0 1px var(--accent-green), 0 0 14px -2px oklch(0.78 0.18 150 / 0.4); }
+  @keyframes soft-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px oklch(0.78 0.18 150 / 0.4), 0 0 18px -4px oklch(0.78 0.18 150 / 0.4); }
+    50% { box-shadow: 0 0 0 1px oklch(0.78 0.18 150 / 0.7), 0 0 28px -2px oklch(0.78 0.18 150 / 0.6); }
   }
-  .animate-neon-pulse { animation: neon-pulse 2.4s ease-in-out infinite; }
-  @keyframes flow-dash { to { stroke-dashoffset: -20; } }
+  .animate-soft-pulse { animation: soft-pulse 2.6s ease-in-out infinite; }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-fade-up { animation: fade-up 0.32s ease-out both; }
+  @keyframes flow-dash { to { stroke-dashoffset: -24; } }
 }
 
-/* React Flow theme overrides */
-.react-flow__edge-path { stroke: var(--neon) !important; stroke-width: 2; filter: drop-shadow(0 0 4px oklch(0.85 0.25 145 / 0.5)); }
-.react-flow__edge.animated path { stroke-dasharray: 6 4; animation: flow-dash 0.6s linear infinite; }
-.react-flow__handle { background: var(--neon) !important; border: 2px solid oklch(0.16 0.02 150) !important; width: 10px !important; height: 10px !important; box-shadow: 0 0 8px var(--neon); }
-.react-flow__controls button { background: var(--panel) !important; border-bottom: 1px solid var(--border) !important; color: var(--foreground) !important; }
-.react-flow__controls button:hover { background: var(--accent) !important; }
-.react-flow__minimap { background: oklch(0.13 0.025 150) !important; border: 1px solid var(--border) !important; border-radius: 8px; }
+/* React Flow theme overrides — minimal & green accents */
+.react-flow__edge-path { stroke: oklch(0.55 0.06 150) !important; stroke-width: 1.5; }
+.react-flow__edge.animated path { stroke: var(--accent-green) !important; stroke-dasharray: 4 6; animation: flow-dash 0.6s linear infinite; filter: drop-shadow(0 0 4px oklch(0.78 0.18 150 / 0.5)); }
+.react-flow__handle { background: var(--accent-green) !important; border: 2px solid oklch(0.135 0.005 250) !important; width: 9px !important; height: 9px !important; }
+.react-flow__handle:hover { box-shadow: 0 0 10px var(--accent-green); }
+.react-flow__controls { box-shadow: var(--shadow-elevated) !important; border-radius: 10px; overflow: hidden; }
+.react-flow__controls button { background: var(--panel) !important; border-bottom: 1px solid var(--border) !important; color: var(--foreground) !important; width: 26px !important; height: 26px !important; }
+.react-flow__controls button:hover { background: var(--accent) !important; color: var(--accent-green) !important; }
+.react-flow__minimap { background: oklch(0.13 0.005 250) !important; border: 1px solid var(--border) !important; border-radius: 10px; box-shadow: var(--shadow-elevated); }
 .react-flow__attribution { display: none; }
 
 html { color-scheme: dark; }

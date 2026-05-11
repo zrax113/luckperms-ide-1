@@ -2,13 +2,13 @@ import { PLUGIN_REGISTRY, ALL_PERMISSIONS, type PluginRegistry } from "./data/pl
 
 export type AppConfig = {
   brand: { name: string; tagline: string; accent: string; logo: string };
-  ui: { showOnboarding: boolean; compactMode: boolean; defaultPanelOpen: boolean };
+  ui: { showOnboarding: boolean; compactMode: boolean; defaultPanelOpen: boolean; permissionAutocomplete: boolean; backgroundAnim: boolean };
   extraPlugins: PluginRegistry[];
 };
 
 const DEFAULT: AppConfig = {
   brand: { name: "LuckPerms Visual Tree", tagline: "studio · 1.0", accent: "#22e08c", logo: "⚡" },
-  ui: { showOnboarding: true, compactMode: true, defaultPanelOpen: true },
+  ui: { showOnboarding: true, compactMode: true, defaultPanelOpen: true, permissionAutocomplete: true, backgroundAnim: true },
   extraPlugins: [],
 };
 

@@ -77,4 +77,68 @@ export const TEMPLATES: Template[] = [
     ],
     users: [],
   },
+  {
+    id: "skyblock",
+    name: "Skyblock Starter",
+    description: "Island ranks with claim and economy basics for a skyblock server",
+    groups: [
+      { id: "g_default", name: "default", weight: 0, color: "#94a3b8", parents: [], permissions: [
+        p("essentials.home", true, "EssentialsX"), p("essentials.warp", true, "EssentialsX"), p("essentials.balance", true, "EssentialsX"),
+        p("griefprevention.claims", true, "GriefPrevention"), p("essentials.msg", true, "EssentialsX"),
+      ]},
+      { id: "g_member", name: "island-member", weight: 15, color: "#22c55e", prefix: "&2[ISLAND] ", parents: ["g_default"], permissions: [
+        p("essentials.warp.island", true, "EssentialsX"), p("essentials.hat", true, "EssentialsX"), p("essentials.nick", true, "EssentialsX"),
+      ]},
+      { id: "g_builder", name: "island-builder", weight: 35, color: "#06b6d4", prefix: "&b[BUILDER] ", parents: ["g_member"], permissions: [
+        p("worldedit.region.set", true, "WorldEdit"), p("griefprevention.adminclaims", true, "GriefPrevention"), p("vault.admin", true, "Vault"),
+      ]},
+      { id: "g_manager", name: "island-manager", weight: 60, color: "#a855f7", prefix: "&5[MANAGER] ", parents: ["g_builder"], permissions: [
+        p("worldguard.region.flag", true, "WorldGuard"), p("essentials.fly", true, "EssentialsX"), p("luckperms.group.weight", true, "LuckPerms"),
+      ]},
+      { id: "g_admin", name: "admin", weight: 100, color: "#ef4444", prefix: "&c[ADMIN] ", parents: ["g_manager"], permissions: [
+        p("worldedit.*", true, "WorldEdit"), p("worldguard.region.bypass.*", true, "WorldGuard"), p("litebans.ban", true, "LiteBans"),
+      ]},
+    ],
+    users: [],
+  },
+  {
+    id: "prison",
+    name: "Prison Progression",
+    description: "Create prison ranks with guard and warden staff roles",
+    groups: [
+      { id: "g_peon", name: "peon", weight: 0, color: "#94a3b8", parents: [], permissions: [
+        p("essentials.help", true, "EssentialsX"), p("essentials.list", true, "EssentialsX"),
+      ]},
+      { id: "g_guard", name: "guard", weight: 40, color: "#f59e0b", prefix: "&6[GUARD] ", parents: ["g_peon"], permissions: [
+        p("litebans.kick", true, "LiteBans"), p("litebans.mute", true, "LiteBans"), p("coreprotect.lookup", true, "CoreProtect"),
+      ]},
+      { id: "g_warden", name: "warden", weight: 70, color: "#22c55e", prefix: "&2[WARDEN] ", parents: ["g_guard"], permissions: [
+        p("litebans.tempban", true, "LiteBans"), p("coreprotect.rollback", true, "CoreProtect"), p("worldguard.region.flag", true, "WorldGuard"),
+      ]},
+      { id: "g_admin", name: "admin", weight: 100, color: "#ef4444", prefix: "&c[ADMIN] ", parents: ["g_warden"], permissions: [
+        p("worldedit.*", true, "WorldEdit"), p("essentials.ban", true, "EssentialsX"), p("luckperms.editor", true, "LuckPerms"),
+      ]},
+    ],
+    users: [],
+  },
+  {
+    id: "creative",
+    name: "Creative Build Team",
+    description: "Builder ranks with creative edit permissions and staff support",
+    groups: [
+      { id: "g_visitor", name: "visitor", weight: 0, color: "#94a3b8", parents: [], permissions: [
+        p("essentials.help", true, "EssentialsX"), p("essentials.spawn", true, "EssentialsX"),
+      ]},
+      { id: "g_builder", name: "builder", weight: 30, color: "#06b6d4", prefix: "&b[BUILDER] ", parents: ["g_visitor"], permissions: [
+        p("worldedit.region.set", true, "WorldEdit"), p("essentials.fly", true, "EssentialsX"),
+      ]},
+      { id: "g_architect", name: "architect", weight: 55, color: "#a855f7", prefix: "&5[ARCH] ", parents: ["g_builder"], permissions: [
+        p("worldedit.brush.sphere", true, "WorldEdit"), p("worldedit.region.copy", true, "WorldEdit"),
+      ]},
+      { id: "g_staff", name: "creative-staff", weight: 85, color: "#22c55e", prefix: "&2[STAFF] ", parents: ["g_architect"], permissions: [
+        p("essentials.god", true, "EssentialsX"), p("worldguard.region.wand", true, "WorldGuard"), p("coreprotect.inspect", true, "CoreProtect"),
+      ]},
+    ],
+    users: [],
+  },
 ];

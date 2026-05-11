@@ -31,6 +31,7 @@ export function SettingsDialog({ open, onOpenChange, onTutorial }: { open: boole
       ui: { ...cfg.ui, permissionAutocomplete: autocomplete, backgroundAnim: bgAnim },
     });
     toast.success("Settings saved");
+    setTimeout(() => onOpenChange(false), 300);
   };
 
   const addPlugin = async () => {

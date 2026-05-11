@@ -91,23 +91,22 @@ function Index() {
         <PanelGroup orientation="horizontal" id="lpvt-h-layout">
           {leftOpen && (
             <>
-              <Panel id="left" defaultSize={16} minSize={10} maxSize={30}>
+              <Panel id="left" defaultSize="22%" minSize="15%" maxSize="35%" collapsible={false}>
                 <Sidebar onOpenDialog={(k) => setDialog(k)} />
               </Panel>
               <ResizeBar />
             </>
           )}
-          <Panel id="main" minSize={30}>
+          <Panel id="main" minSize="30%" collapsible={false}>
             <PanelGroup orientation="vertical" id="lpvt-v-layout">
-              <Panel id="tree" defaultSize={panelOpen ? 62 : 96} minSize={20}>
+              <Panel id="tree" defaultSize={`${panelOpen ? 62 : 96}%`} minSize={`${panelOpen ? 62 : 96}%`} maxSize={`${panelOpen ? 62 : 96}%`} collapsible={false}>
                 <main className="h-full flex flex-col overflow-hidden bg-background relative">
                   <div className="flex-1 relative">
                     <FamilyTree />
                   </div>
                 </main>
               </Panel>
-              {panelOpen && <ResizeBar vertical />}
-              <Panel id="bottom" defaultSize={panelOpen ? 38 : 4} minSize={4} maxSize={70}>
+              <Panel id="bottom" defaultSize={`${panelOpen ? 38 : 4}%`} minSize={`${panelOpen ? 38 : 4}%`} maxSize={`${panelOpen ? 38 : 4}%`} collapsible={false}>
                 <PermissionsPanel collapsed={!panelOpen} onToggle={() => setPanelOpen(o => !o)} />
               </Panel>
             </PanelGroup>
@@ -115,7 +114,7 @@ function Index() {
           {rightOpen && (
             <>
               <ResizeBar />
-              <Panel id="right" defaultSize={20} minSize={14} maxSize={36}>
+              <Panel id="right" defaultSize="20%" minSize="15%" maxSize="35%" collapsible={false}>
                 <Inspector />
               </Panel>
             </>
@@ -151,8 +150,8 @@ function Index() {
 
 function ResizeBar({ vertical }: { vertical?: boolean } = {}) {
   return (
-    <PanelResizeHandle className={`group relative ${vertical ? "h-1 w-full" : "w-1 h-full"} bg-border hover:bg-primary/50 transition-colors data-[resize-handle-active]:bg-primary`}>
-      <div className={`absolute inset-0 ${vertical ? "h-3 -translate-y-1" : "w-3 -translate-x-1"} group-hover:bg-primary/10`} />
+    <PanelResizeHandle className={`group relative ${vertical ? "h-1 w-full" : "w-1 h-full"} bg-border/60 hover:bg-primary/60 transition-colors data-[resize-handle-active]:bg-primary`}>
+      <div className={`absolute ${vertical ? "h-5 -top-2 left-0 right-0" : "w-5 -left-2 top-0 bottom-0"} group-hover:bg-primary/5`} />
     </PanelResizeHandle>
   );
 }

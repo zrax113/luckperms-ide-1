@@ -69,14 +69,19 @@ export function updateConfig(patch: Partial<AppConfig>) {
   _listeners.forEach(fn => fn());
 }
 
-// hex -> oklch (rough). We just inject as CSS var override.
+// hex -> CSS variable (with oklch fallback for consistency)
 function applyAccent(hex: string) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
+  // Directly set as hex (CSS will handle the value)
   root.style.setProperty("--brand-accent", hex);
-  // override the green tokens to follow brand
+  // Override the primary tokens to follow brand accent
   root.style.setProperty("--primary", hex);
   root.style.setProperty("--ring", hex);
   root.style.setProperty("--success", hex);
   root.style.setProperty("--accent-green", hex);
+  // Also set primary-foreground to a compatible color for text on the accent
+  root.style.setProperty("--primary-foreground", "oklch(0.12 0.02 250)");
+  // Force repaint to ensure the change is visible
+  root.offsetHeight;
 }

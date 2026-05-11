@@ -3,10 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
+type PromptOpts = { title: string; placeholder?: string; defaultValue?: string; submitLabel?: string; multiline?: boolean };
 type Resolver = (value: string | null) => void;
-let openHandler: ((opts: { title: string; placeholder?: string; defaultValue?: string; submitLabel?: string }) => Promise<string | null>) | null = null;
+let openHandler: ((opts: PromptOpts) => Promise<string | null>) | null = null;
 
-export function showPrompt(opts: { title: string; placeholder?: string; defaultValue?: string; submitLabel?: string }) {
+export function showPrompt(opts: PromptOpts) {
   if (!openHandler) return Promise.resolve(null);
   return openHandler(opts);
 }
@@ -38,8 +39,13 @@ export function PromptModalRoot() {
         <motion.form initial={{ y: 4, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           onSubmit={(e) => { e.preventDefault(); if (value.trim()) close(value.trim()); }}
           className="px-5 pb-5 space-y-3">
-          <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} placeholder={opts?.placeholder}
-            className="w-full h-10 px-3 rounded-md bg-input border border-border focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition text-sm" />
+          {opts?.multiline ? (
+            <textarea autoFocus value={value} onChange={(e) => setValue(e.target.value)} placeholder={opts?.placeholder}
+              className="w-full h-28 px-3 py-2 rounded-md bg-input border border-border focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition text-sm font-mono resize-none" />
+          ) : (
+            <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} placeholder={opts?.placeholder}
+              className="w-full h-10 px-3 rounded-md bg-input border border-border focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition text-sm" />
+          )}
           <div className="flex items-center justify-end gap-2">
             <button type="button" onClick={() => close(null)} className="px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground transition">Cancel</button>
             <button type="submit" disabled={!value.trim()} className="glint px-4 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 hover:glow-green transition">

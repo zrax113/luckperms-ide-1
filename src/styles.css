@@ -32,49 +32,49 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-panel: var(--panel);
-  --color-panel-foreground: var(--panel-foreground);
-  --color-sidebar-bg: var(--sidebar-bg);
   --color-titlebar: var(--titlebar);
-  --color-glow: var(--glow);
+  --color-sidebar-bg: var(--sidebar-bg);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
+  --color-neon: var(--neon);
 }
 
 :root, .dark {
   --radius: 0.5rem;
-  /* IDE dark palette */
-  --background: oklch(0.18 0.02 270);
-  --foreground: oklch(0.95 0.01 270);
-  --titlebar: oklch(0.14 0.02 270);
-  --sidebar-bg: oklch(0.16 0.02 270);
-  --panel: oklch(0.21 0.02 270);
-  --panel-foreground: oklch(0.95 0.01 270);
-  --card: oklch(0.22 0.025 270);
-  --card-foreground: oklch(0.96 0.01 270);
-  --popover: oklch(0.20 0.02 270);
-  --popover-foreground: oklch(0.96 0.01 270);
-  --primary: oklch(0.72 0.18 195);
-  --primary-foreground: oklch(0.12 0.02 270);
-  --secondary: oklch(0.28 0.03 270);
-  --secondary-foreground: oklch(0.96 0.01 270);
-  --muted: oklch(0.25 0.02 270);
-  --muted-foreground: oklch(0.65 0.02 270);
-  --accent: oklch(0.32 0.05 270);
-  --accent-foreground: oklch(0.98 0.005 270);
-  --destructive: oklch(0.65 0.22 25);
+  /* Neon-green IDE palette */
+  --background: oklch(0.16 0.02 150);
+  --foreground: oklch(0.96 0.02 150);
+  --titlebar: oklch(0.13 0.025 150);
+  --sidebar-bg: oklch(0.14 0.025 150);
+  --panel: oklch(0.18 0.03 150);
+  --card: oklch(0.20 0.035 150);
+  --card-foreground: oklch(0.96 0.02 150);
+  --popover: oklch(0.18 0.03 150);
+  --popover-foreground: oklch(0.96 0.02 150);
+  --primary: oklch(0.85 0.25 145);
+  --primary-foreground: oklch(0.12 0.04 150);
+  --secondary: oklch(0.26 0.04 150);
+  --secondary-foreground: oklch(0.96 0.02 150);
+  --muted: oklch(0.22 0.03 150);
+  --muted-foreground: oklch(0.68 0.05 145);
+  --accent: oklch(0.30 0.06 150);
+  --accent-foreground: oklch(0.98 0.02 150);
+  --destructive: oklch(0.68 0.24 25);
   --destructive-foreground: oklch(0.98 0.005 0);
-  --success: oklch(0.72 0.18 150);
-  --warning: oklch(0.78 0.16 75);
-  --info: oklch(0.72 0.16 230);
-  --border: oklch(0.28 0.02 270);
-  --input: oklch(0.24 0.02 270);
-  --ring: oklch(0.72 0.18 195);
-  --glow: oklch(0.72 0.2 195);
+  --success: oklch(0.85 0.25 145);
+  --warning: oklch(0.82 0.18 90);
+  --info: oklch(0.78 0.16 200);
+  --border: oklch(0.28 0.04 150);
+  --input: oklch(0.22 0.03 150);
+  --ring: oklch(0.85 0.25 145);
+  --neon: oklch(0.88 0.28 142);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.72 0.18 195), oklch(0.62 0.2 260));
-  --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.72 0.2 195 / 0.18), transparent 70%);
-  --shadow-glow: 0 0 24px -4px oklch(0.72 0.2 195 / 0.45);
+  --gradient-primary: linear-gradient(135deg, oklch(0.88 0.28 142), oklch(0.78 0.22 175));
+  --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.85 0.25 145 / 0.20), transparent 70%);
+  --shadow-glow: 0 0 32px -4px oklch(0.85 0.25 145 / 0.55);
+  --shadow-neon-sm: 0 0 12px oklch(0.85 0.25 145 / 0.4);
+  --shadow-neon-lg: 0 0 40px oklch(0.85 0.25 145 / 0.6);
   --shadow-panel: 0 4px 30px -10px oklch(0 0 0 / 0.5);
 }
 
@@ -88,43 +88,51 @@
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     background-image:
-      radial-gradient(circle at 0% 0%, oklch(0.72 0.2 195 / 0.06), transparent 40%),
-      radial-gradient(circle at 100% 100%, oklch(0.62 0.2 260 / 0.06), transparent 40%);
+      radial-gradient(circle at 0% 0%, oklch(0.85 0.25 145 / 0.08), transparent 45%),
+      radial-gradient(circle at 100% 100%, oklch(0.78 0.22 175 / 0.06), transparent 45%),
+      linear-gradient(to bottom, transparent, oklch(0.10 0.02 150 / 0.4));
   }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: oklch(0.3 0.02 270); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
-  ::-webkit-scrollbar-thumb:hover { background: oklch(0.4 0.02 270); background-clip: padding-box; border: 2px solid transparent; }
+  ::-webkit-scrollbar-thumb { background: oklch(0.30 0.04 150); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--neon); background-clip: padding-box; border: 2px solid transparent; }
 }
 
 @layer utilities {
-  .glass {
-    background: color-mix(in oklab, var(--panel) 70%, transparent);
-    backdrop-filter: blur(14px) saturate(140%);
-  }
-  .glow-primary { box-shadow: var(--shadow-glow); }
-  .text-glow { text-shadow: 0 0 12px oklch(0.72 0.2 195 / 0.6); }
+  .glass { background: color-mix(in oklab, var(--panel) 75%, transparent); backdrop-filter: blur(16px) saturate(160%); }
+  .glow-neon { box-shadow: var(--shadow-neon-sm); }
+  .glow-neon-lg { box-shadow: var(--shadow-neon-lg); }
+  .text-neon { color: var(--neon); text-shadow: 0 0 12px oklch(0.85 0.25 145 / 0.7); }
   .gradient-primary { background: var(--gradient-primary); }
-  .gradient-text {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .gradient-text { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grid-bg {
+    background-image:
+      linear-gradient(oklch(0.85 0.25 145 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.85 0.25 145 / 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
-  .glint {
-    position: relative;
-    overflow: hidden;
-  }
+  .glint { position: relative; overflow: hidden; }
   .glint::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(115deg, transparent 30%, oklch(1 0 0 / 0.08) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform 0.8s ease;
-    pointer-events: none;
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(115deg, transparent 30%, oklch(0.85 0.25 145 / 0.18) 50%, transparent 70%);
+    transform: translateX(-100%); transition: transform 0.9s ease; pointer-events: none;
   }
   .glint:hover::after { transform: translateX(100%); }
+  @keyframes neon-pulse {
+    0%, 100% { box-shadow: 0 0 16px oklch(0.85 0.25 145 / 0.4), 0 0 32px oklch(0.85 0.25 145 / 0.2); }
+    50% { box-shadow: 0 0 24px oklch(0.85 0.25 145 / 0.7), 0 0 48px oklch(0.85 0.25 145 / 0.4); }
+  }
+  .animate-neon-pulse { animation: neon-pulse 2.4s ease-in-out infinite; }
+  @keyframes flow-dash { to { stroke-dashoffset: -20; } }
 }
+
+/* React Flow theme overrides */
+.react-flow__edge-path { stroke: var(--neon) !important; stroke-width: 2; filter: drop-shadow(0 0 4px oklch(0.85 0.25 145 / 0.5)); }
+.react-flow__edge.animated path { stroke-dasharray: 6 4; animation: flow-dash 0.6s linear infinite; }
+.react-flow__handle { background: var(--neon) !important; border: 2px solid oklch(0.16 0.02 150) !important; width: 10px !important; height: 10px !important; box-shadow: 0 0 8px var(--neon); }
+.react-flow__controls button { background: var(--panel) !important; border-bottom: 1px solid var(--border) !important; color: var(--foreground) !important; }
+.react-flow__controls button:hover { background: var(--accent) !important; }
+.react-flow__minimap { background: oklch(0.13 0.025 150) !important; border: 1px solid var(--border) !important; border-radius: 8px; }
+.react-flow__attribution { display: none; }
 
 html { color-scheme: dark; }

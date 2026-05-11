@@ -172,7 +172,6 @@ function FamilyTreeInner() {
       if (u) {
         if (u.groups.includes(c.source)) { toast.info(`${u.username} already in group`); return; }
         updateUser(u.id, { groups: [...u.groups, c.source] });
-        const g = users && c.source ? null : null;
         toast.success(`Added ${u.username} to group`);
       }
       return;

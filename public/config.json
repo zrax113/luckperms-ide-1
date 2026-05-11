@@ -1,0 +1,40 @@
+{
+  "brand": {
+    "name": "LuckPerms Visual Tree",
+    "tagline": "studio · 1.0",
+    "accent": "#22e08c",
+    "logo": "⚡"
+  },
+  "ui": {
+    "showOnboarding": true,
+    "compactMode": true,
+    "defaultPanelOpen": true
+  },
+  "extraPlugins": [
+    {
+      "plugin": "GriefPrevention",
+      "version": "16.18",
+      "color": "#84cc16",
+      "categories": [
+        { "name": "Claims", "permissions": [
+          { "node": "griefprevention.claims", "description": "Create land claims" },
+          { "node": "griefprevention.adminclaims", "description": "Manage admin claims" },
+          { "node": "griefprevention.ignoreclaims", "description": "Bypass claim protection" }
+        ]}
+      ]
+    },
+    {
+      "plugin": "ChestShop",
+      "version": "3.12",
+      "color": "#f59e0b",
+      "categories": [
+        { "name": "Shops", "permissions": [
+          { "node": "chestshop.shop.create", "description": "Create a chest shop" },
+          { "node": "chestshop.shop.destroy.others", "description": "Break others' shops" },
+          { "node": "chestshop.admin", "description": "Admin commands" }
+        ]}
+      ]
+    }
+  ],
+  "extraTemplates": []
+}

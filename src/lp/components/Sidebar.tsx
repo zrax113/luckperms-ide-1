@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Users, Shield, GitBranch, Package, FileText, Plus, Trash2, Copy, Search, Layers, ArrowRight } from "lucide-react";
+import { ChevronRight, Users, Shield, GitBranch, Package, FileText, Plus, Trash2, Copy, Search, Layers, ArrowRight, X } from "lucide-react";
 import { useStore } from "../store/store";
 import { PLUGIN_REGISTRY } from "../data/plugins";
 import { TEMPLATES } from "../data/templates";
@@ -32,7 +32,7 @@ function Section({ title, icon: Icon, count, children, defaultOpen = true, actio
 }
 
 export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void }) {
-  const { groups, users, selection, setSelection, addGroup, addUser, deleteGroup, deleteUser, cloneGroup, loadData, mergeData, addPermission } = useStore();
+  const { groups, users, tracks, selection, setSelection, addGroup, addUser, deleteGroup, deleteUser, cloneGroup, mergeData, addPermission, addTrack, updateTrack, deleteTrack } = useStore();
   const [q, setQ] = useState("");
   const fg = groups.filter(g => g.name.toLowerCase().includes(q.toLowerCase()));
   const fu = users.filter(u => u.username.toLowerCase().includes(q.toLowerCase()));
@@ -64,9 +64,22 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
     }
     toast.success(`Imported ${added} ${pluginName} perms into ${g.name}`);
   };
+  const newTrack = async () => {
+    const n = await showPrompt({ title: "New track", placeholder: "e.g. staff", submitLabel: "Create track" });
+    if (n) { addTrack(n); toast.success(`Created track "${n}"`); }
+  };
+  const addToTrack = async (trackId: string) => {
+    const tr = tracks.find(t => t.id === trackId); if (!tr) return;
+    const name = await showPrompt({ title: `Add group to "${tr.name}"`, placeholder: "group name", submitLabel: "Add" });
+    if (!name) return;
+    const g = groups.find(x => x.name.toLowerCase() === name.toLowerCase());
+    if (!g) { toast.error(`Group "${name}" not found`); return; }
+    if (tr.chain.includes(g.id)) { toast.info("Already in track"); return; }
+    updateTrack(trackId, { chain: [...tr.chain, g.id] });
+  };
 
   return (
-    <aside className="w-60 shrink-0 bg-sidebar-bg border-r border-border flex flex-col">
+    <aside className="h-full w-full bg-sidebar-bg border-r border-border flex flex-col overflow-hidden">
       <div className="p-2 border-b border-border">
         <div className="relative">
           <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -115,24 +128,36 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
           </div>
         </Section>
 
-        <Section title="Tracks" icon={GitBranch} count={2} defaultOpen={false}>
+        <Section title="Tracks" icon={GitBranch} count={tracks.length} defaultOpen={false}
+          action={<button onClick={newTrack} className="text-primary hover:text-primary/80 px-1"><Plus className="w-3 h-3" /></button>}>
           <div className="px-2 py-1 text-[11px] space-y-1.5">
-            {[
-              { name: "staff", chain: ["helper", "moderator", "admin"] },
-              { name: "donor", chain: ["vip", "mvp", "legend"] },
-            ].map(tr => (
-              <div key={tr.name} className="rounded-md bg-card/50 border border-border/60 p-2 hover:border-primary/30 transition">
-                <div className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">{tr.name}</div>
+            {tracks.map(tr => (
+              <div key={tr.id} className="rounded-md bg-card/50 border border-border/60 p-2 hover:border-primary/30 transition group/track">
+                <div className="flex items-center gap-1.5">
+                  <div className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground flex-1 truncate">{tr.name}</div>
+                  <button onClick={() => addToTrack(tr.id)} className="opacity-0 group-hover/track:opacity-100 text-primary hover:text-primary/80"><Plus className="w-2.5 h-2.5" /></button>
+                  <button onClick={() => { deleteTrack(tr.id); toast(`Deleted track ${tr.name}`); }} className="opacity-0 group-hover/track:opacity-100 text-muted-foreground hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
+                </div>
                 <div className="flex items-center gap-1 mt-1 text-[10px] font-mono flex-wrap">
-                  {tr.chain.map((c, i) => (
-                    <span key={c} className="flex items-center gap-1">
-                      {i > 0 && <ArrowRight className="w-2.5 h-2.5 text-primary/60" />}
-                      <span className="text-foreground">{c}</span>
-                    </span>
-                  ))}
+                  {tr.chain.length === 0 && <span className="italic text-muted-foreground">empty — click + to add</span>}
+                  {tr.chain.map((gid, i) => {
+                    const g = groups.find(x => x.id === gid);
+                    if (!g) return null;
+                    return (
+                      <span key={gid} className="flex items-center gap-1 group/chip">
+                        {i > 0 && <ArrowRight className="w-2.5 h-2.5 text-primary/60" />}
+                        <button onClick={() => setSelection({ type: "group", id: g.id })} className="hover:text-primary transition flex items-center gap-1">
+                          <span className="w-1 h-1 rounded-full" style={{ background: g.color }} />
+                          {g.name}
+                        </button>
+                        <button onClick={() => updateTrack(tr.id, { chain: tr.chain.filter(x => x !== gid) })} className="opacity-0 group-hover/chip:opacity-100 text-muted-foreground hover:text-destructive"><X className="w-2 h-2" /></button>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             ))}
+            {!tracks.length && <div className="px-1 text-muted-foreground italic text-[10px]">No tracks. Click + to create one.</div>}
           </div>
         </Section>
 

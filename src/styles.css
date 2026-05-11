@@ -126,6 +126,12 @@
   @keyframes fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .animate-fade-up { animation: fade-up 0.32s ease-out both; }
   @keyframes flow-dash { to { stroke-dashoffset: -24; } }
+  @keyframes shine { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
+  .glow-neon { box-shadow: var(--shadow-glint); }
+  .glow-neon-lg { box-shadow: var(--shadow-glint-soft); }
+  .text-neon { color: var(--accent-green); text-shadow: 0 0 10px oklch(0.78 0.18 150 / 0.5); }
+  .gradient-primary { background: linear-gradient(135deg, var(--primary), var(--accent-green)); }
+  .animate-neon-pulse { animation: soft-pulse 2.6s ease-in-out infinite; }
 }
 
 /* React Flow theme overrides — minimal & green accents */

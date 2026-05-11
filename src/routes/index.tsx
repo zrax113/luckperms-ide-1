@@ -86,7 +86,7 @@ function Index() {
     <div className="dark h-screen flex flex-col overflow-hidden bg-background text-foreground">
       <TopBar onOpen={open} onToggleLeft={() => setLeftOpen(o => !o)} onToggleRight={() => setRightOpen(o => !o)} />
       <div className="flex-1 overflow-hidden">
-        <PanelGroup direction="horizontal" autoSaveId="lpvt-h-layout">
+        <PanelGroup orientation="horizontal" id="lpvt-h-layout">
           {leftOpen && (
             <>
               <Panel id="left" defaultSize={16} minSize={10} maxSize={30}>
@@ -96,7 +96,7 @@ function Index() {
             </>
           )}
           <Panel id="main" minSize={30}>
-            <PanelGroup direction="vertical" autoSaveId="lpvt-v-layout">
+            <PanelGroup orientation="vertical" id="lpvt-v-layout">
               <Panel id="tree" defaultSize={panelOpen ? 62 : 96} minSize={20}>
                 <main className="h-full flex flex-col overflow-hidden bg-background relative">
                   <div className="flex-1 relative">

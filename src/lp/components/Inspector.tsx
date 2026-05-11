@@ -178,8 +178,8 @@ const NameField = ({ label, value, onChange }: any) => (
       className="w-full mt-1 bg-transparent text-lg font-bold tracking-tight outline-none focus:text-neon transition" />
   </div>
 );
-const LabeledInput = ({ value, onChange, placeholder, mono }: any) => (
-  <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+const LabeledInput = ({ value, onChange, placeholder, mono }: { value: string; onChange: (v: string) => void; placeholder?: string; mono?: boolean }) => (
+  <input value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)} placeholder={placeholder}
     className={`w-full h-8 px-2 text-xs rounded-md bg-input border border-border focus:border-primary outline-none ${mono ? "font-mono" : ""}`} />
 );
 const ToggleRow = ({ label, checked, onChange, icon }: any) => (

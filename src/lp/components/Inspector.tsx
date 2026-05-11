@@ -171,7 +171,7 @@ const Block = ({ title, children }: any) => (
 const Field = ({ label, children }: any) => (
   <div><label className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{label}</label><div className="mt-1">{children}</div></div>
 );
-const NameField = ({ label, value, onChange }: any) => (
+const NameField = ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
   <div className="rounded-lg border border-primary/30 bg-gradient-to-br from-primary/10 to-transparent p-3 glow-neon">
     <div className="text-[10px] uppercase tracking-wider text-primary font-mono">{label}</div>
     <input value={value} onChange={(e) => onChange(e.target.value)}
@@ -182,7 +182,7 @@ const LabeledInput = ({ value, onChange, placeholder, mono }: { value: string; o
   <input value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)} placeholder={placeholder}
     className={`w-full h-8 px-2 text-xs rounded-md bg-input border border-border focus:border-primary outline-none ${mono ? "font-mono" : ""}`} />
 );
-const ToggleRow = ({ label, checked, onChange, icon }: any) => (
+const ToggleRow = ({ label, checked, onChange, icon }: { label: string; checked: boolean; onChange: (v: boolean) => void; icon?: React.ReactNode }) => (
   <div className="flex items-center justify-between">
     <span className="text-xs flex items-center gap-1.5">{icon}{label}</span>
     <Switch checked={checked} onCheckedChange={onChange} />

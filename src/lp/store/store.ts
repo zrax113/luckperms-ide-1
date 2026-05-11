@@ -62,6 +62,8 @@ type State = {
   redo: () => void;
   loadDemoData: () => void;
   reset: () => void;
+  loadData: (groups: Group[], users: User[]) => void;
+  mergeData: (groups: Group[], users: User[]) => void;
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -181,6 +183,16 @@ export const useStore = create<State>()(
       },
       loadDemoData: () => set({ groups: demoGroups(), users: demoUsers(), selection: { type: "group", id: "g_vip" }, history: [], future: [] }),
       reset: () => set({ groups: [], users: [], selection: null, history: [], future: [] }),
+      loadData: (groups, users) => { pushHistory(set, get); set({ groups, users, selection: null }); },
+      mergeData: (groups, users) => {
+        pushHistory(set, get);
+        const cur = get();
+        const existingNames = new Set(cur.groups.map(g => g.name));
+        const merged = [...cur.groups, ...groups.filter(g => !existingNames.has(g.name))];
+        const existingUuids = new Set(cur.users.map(u => u.uuid));
+        const mergedU = [...cur.users, ...users.filter(u => !existingUuids.has(u.uuid))];
+        set({ groups: merged, users: mergedU });
+      },
     }),
     { name: "luckperms-visual-tree", partialize: (s) => ({ groups: s.groups, users: s.users }) }
   )

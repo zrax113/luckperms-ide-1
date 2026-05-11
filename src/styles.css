@@ -132,6 +132,41 @@
   .text-neon { color: var(--accent-green); text-shadow: 0 0 10px oklch(0.78 0.18 150 / 0.5); }
   .gradient-primary { background: linear-gradient(135deg, var(--primary), var(--accent-green)); }
   .animate-neon-pulse { animation: soft-pulse 2.6s ease-in-out infinite; }
+
+  /* Animated atmospheric background */
+  @keyframes drift {
+    0%   { transform: translate(0,0); }
+    50%  { transform: translate(-30px, 20px); }
+    100% { transform: translate(0, 0); }
+  }
+  @keyframes hue-shift {
+    0%, 100% { opacity: 0.7; filter: hue-rotate(0deg); }
+    50%      { opacity: 1;    filter: hue-rotate(20deg); }
+  }
+  .bg-anim {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  }
+  .bg-anim::before, .bg-anim::after {
+    content: ""; position: absolute; border-radius: 50%; filter: blur(80px);
+    will-change: transform, opacity;
+  }
+  .bg-anim::before {
+    width: 540px; height: 540px; left: -120px; top: -160px;
+    background: radial-gradient(circle, oklch(0.78 0.18 150 / 0.16), transparent 60%);
+    animation: drift 18s ease-in-out infinite, hue-shift 12s ease-in-out infinite;
+  }
+  .bg-anim::after {
+    width: 620px; height: 620px; right: -180px; bottom: -200px;
+    background: radial-gradient(circle, oklch(0.74 0.13 230 / 0.12), transparent 60%);
+    animation: drift 22s ease-in-out infinite reverse, hue-shift 16s ease-in-out infinite;
+  }
+
+  /* Premium card with gradient border */
+  .premium-card {
+    background: linear-gradient(var(--panel), var(--panel)) padding-box,
+                linear-gradient(135deg, oklch(0.78 0.18 150 / 0.4), transparent 50%, oklch(0.74 0.13 230 / 0.3)) border-box;
+    border: 1px solid transparent;
+  }
 }
 
 /* React Flow theme overrides — minimal & green accents */

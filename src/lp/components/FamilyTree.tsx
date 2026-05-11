@@ -7,6 +7,7 @@ import ReactFlow, {
 import { motion } from "framer-motion";
 import { Crown, Users, Shield, ChevronRight } from "lucide-react";
 import { useStore, type Group } from "../store/store";
+import { toast } from "sonner";
 
 function GroupNode({ data, selected }: any) {
   const g: Group = data.group;
@@ -164,14 +165,21 @@ function FamilyTreeInner() {
 
   const onConnect = useCallback((c: Connection) => {
     if (!c.source || !c.target) return;
+    if (c.source === c.target) { toast.error("Can't connect a node to itself"); return; }
     const targetIsUser = users.some(u => u.id === c.target);
     if (targetIsUser) {
       const u = users.find(x => x.id === c.target);
-      if (u && !u.groups.includes(c.source)) updateUser(u.id, { groups: [...u.groups, c.source] });
+      if (u) {
+        if (u.groups.includes(c.source)) { toast.info(`${u.username} already in group`); return; }
+        updateUser(u.id, { groups: [...u.groups, c.source] });
+        const g = users && c.source ? null : null;
+        toast.success(`Added ${u.username} to group`);
+      }
       return;
     }
     // group -> group inheritance: source becomes parent of target
     toggleParent(c.target, c.source);
+    toast.success("Inheritance link created", { description: "Source is now a parent of the target" });
   }, [toggleParent, updateUser, users]);
 
   return (

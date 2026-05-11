@@ -18,6 +18,7 @@ import { loadConfig, onConfigChange, getConfig } from "@/lp/config";
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "react-resizable-panels";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Database, GitBranch, Shield, Users } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -84,6 +85,7 @@ function Index() {
 
   return (
     <div className="dark h-screen flex flex-col overflow-hidden bg-background text-foreground">
+      {getConfig().ui.backgroundAnim && <div className="bg-anim" aria-hidden />}
       <TopBar onOpen={open} onToggleLeft={() => setLeftOpen(o => !o)} onToggleRight={() => setRightOpen(o => !o)} />
       <div className="flex-1 overflow-hidden">
         <PanelGroup orientation="horizontal" id="lpvt-h-layout">

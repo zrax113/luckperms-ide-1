@@ -200,11 +200,62 @@ export const useStore = create<State>()(
       mergeData: (groups, users) => {
         pushHistory(set, get);
         const cur = get();
-        const existingNames = new Set(cur.groups.map(g => g.name));
-        const merged = [...cur.groups, ...groups.filter(g => !existingNames.has(g.name))];
+        // Robust merge: re-id new groups (avoid id collisions), remap parents by name,
+        // dedupe perm nodes, and remap user.groups by name.
+        const existingByName = new Map(cur.groups.map(g => [g.name, g] as const));
+        const incomingByOldId = new Map<string, Group>();
+        const finalIdByName = new Map<string, string>(cur.groups.map(g => [g.name, g.id] as const));
+        const newGroups: Group[] = [];
+        for (const g of groups) {
+          const existing = existingByName.get(g.name);
+          if (existing) {
+            // merge permissions (by node)
+            const have = new Set(existing.permissions.map(p => p.node));
+            const addedPerms = g.permissions.filter(p => !have.has(p.node))
+              .map(p => ({ ...p, id: "p_" + uid() }));
+            existing.permissions = [...existing.permissions, ...addedPerms];
+            incomingByOldId.set(g.id, existing);
+            continue;
+          }
+          const newId = "g_" + uid();
+          const remapped: Group = {
+            ...g, id: newId,
+            parents: [], // resolved second pass
+            permissions: g.permissions.map(p => ({ ...p, id: "p_" + uid() })),
+          };
+          newGroups.push(remapped);
+          incomingByOldId.set(g.id, remapped);
+          finalIdByName.set(g.name, newId);
+        }
+        // Resolve parents for new groups: incoming parent ids -> incomingByOldId -> name -> finalIdByName
+        for (const g of groups) {
+          const target = incomingByOldId.get(g.id)!;
+          for (const pOld of g.parents) {
+            const parentRef = incomingByOldId.get(pOld);
+            const parentName = parentRef?.name;
+            const finalId = parentName ? finalIdByName.get(parentName) : undefined;
+            if (finalId && finalId !== target.id && !target.parents.includes(finalId)) {
+              target.parents.push(finalId);
+            }
+          }
+        }
         const existingUuids = new Set(cur.users.map(u => u.uuid));
-        const mergedU = [...cur.users, ...users.filter(u => !existingUuids.has(u.uuid))];
-        set({ groups: merged, users: mergedU });
+        const newUsers: User[] = [];
+        for (const u of users) {
+          if (existingUuids.has(u.uuid)) continue;
+          const remapped: User = {
+            ...u, id: "u_" + uid(),
+            groups: u.groups
+              .map(oldId => incomingByOldId.get(oldId)?.id || finalIdByName.get(oldId) || oldId)
+              .filter(id => cur.groups.some(g => g.id === id) || newGroups.some(g => g.id === id)),
+            permissions: u.permissions.map(p => ({ ...p, id: "p_" + uid() })),
+          };
+          newUsers.push(remapped);
+        }
+        set({
+          groups: [...cur.groups.map(g => existingByName.get(g.name) || g), ...newGroups],
+          users: [...cur.users, ...newUsers],
+        });
       },
     }),
     { name: "luckperms-visual-tree", partialize: (s) => ({ groups: s.groups, users: s.users, tracks: s.tracks }) }

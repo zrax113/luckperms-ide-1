@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Settings, Palette, RotateCcw, Sparkles, Layers, Trash2, FileJson, Plus } from "lucide-react";
+import { Settings, Palette, RotateCcw, Sparkles, Layers, Trash2, FileJson, Plus, Wand2, Eye } from "lucide-react";
 import { getConfig, updateConfig } from "../config";
 import { useStore } from "../store/store";
 import { toast } from "sonner";
 import { showPrompt } from "./PromptModal";
+import { Switch } from "@/components/ui/switch";
 
 const SWATCHES = ["#22e08c", "#22d3ee", "#a855f7", "#f59e0b", "#ef4444", "#ec4899", "#3b82f6"];
 
@@ -13,12 +14,22 @@ export function SettingsDialog({ open, onOpenChange, onTutorial }: { open: boole
   const cfg = getConfig();
   const [brandName, setBrandName] = useState(cfg.brand.name);
   const [accent, setAccent] = useState(cfg.brand.accent);
+  const [autocomplete, setAutocomplete] = useState(cfg.ui.permissionAutocomplete);
+  const [bgAnim, setBgAnim] = useState(cfg.ui.backgroundAnim);
   const { reset, loadDemoData } = useStore();
 
-  useEffect(() => { if (open) { setBrandName(cfg.brand.name); setAccent(cfg.brand.accent); } }, [open]);
+  useEffect(() => {
+    if (open) {
+      setBrandName(cfg.brand.name); setAccent(cfg.brand.accent);
+      setAutocomplete(cfg.ui.permissionAutocomplete); setBgAnim(cfg.ui.backgroundAnim);
+    }
+  }, [open]);
 
   const save = () => {
-    updateConfig({ brand: { ...cfg.brand, name: brandName, accent } });
+    updateConfig({
+      brand: { ...cfg.brand, name: brandName, accent },
+      ui: { ...cfg.ui, permissionAutocomplete: autocomplete, backgroundAnim: bgAnim },
+    });
     toast.success("Settings saved");
   };
 
@@ -65,6 +76,14 @@ export function SettingsDialog({ open, onOpenChange, onTutorial }: { open: boole
             <button onClick={save} className="glint w-full h-9 rounded-md bg-primary text-primary-foreground text-sm font-semibold glow-green hover:glow-green-soft transition">Save branding</button>
           </Section>
 
+          <Section title="Editor" icon={<Wand2 className="w-3.5 h-3.5" />}>
+            <ToggleRow label="Permission autocomplete" hint="Suggest matching nodes when typing custom permissions"
+              checked={autocomplete} onChange={setAutocomplete} icon={<Sparkles className="w-3 h-3" />} />
+            <ToggleRow label="Animated background" hint="Subtle gradient + grid drift behind the workspace"
+              checked={bgAnim} onChange={setBgAnim} icon={<Eye className="w-3 h-3" />} />
+            <button onClick={save} className="glint w-full h-9 rounded-md bg-primary text-primary-foreground text-sm font-semibold glow-green hover:glow-green-soft transition">Save preferences</button>
+          </Section>
+
           <Section title="Custom plugins" icon={<Layers className="w-3.5 h-3.5" />}>
             <div className="space-y-1.5">
               {(cfg.extraPlugins||[]).map(p => (
@@ -94,7 +113,10 @@ export function SettingsDialog({ open, onOpenChange, onTutorial }: { open: boole
                 <FileJson className="w-3 h-3" /> Restore demo
               </button>
               <button onClick={() => {
-                if (confirm("Wipe all groups, users, and tracks? This cannot be undone.")) { reset(); toast.success("Workspace reset"); }
+                toast.warning("Wipe all groups, users & tracks?", {
+                  description: "This cannot be undone.",
+                  action: { label: "Reset", onClick: () => { reset(); toast.success("Workspace reset"); } },
+                });
               }}
                 className="flex-1 h-9 rounded-md border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 text-xs transition flex items-center justify-center gap-1.5">
                 <RotateCcw className="w-3 h-3" /> Reset all
@@ -117,4 +139,13 @@ const Section = ({ title, icon, children }: any) => (
 );
 const Field = ({ label, children }: any) => (
   <div><label className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{label}</label><div className="mt-1">{children}</div></div>
+);
+const ToggleRow = ({ label, hint, checked, onChange, icon }: any) => (
+  <div className="flex items-center gap-2 py-1">
+    <div className="flex-1">
+      <div className="text-xs font-medium flex items-center gap-1.5">{icon} {label}</div>
+      {hint && <div className="text-[10px] text-muted-foreground mt-0.5">{hint}</div>}
+    </div>
+    <Switch checked={checked} onCheckedChange={onChange} />
+  </div>
 );

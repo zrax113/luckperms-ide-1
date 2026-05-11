@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Download, Upload, Copy, FileJson, FileCode, FileText, Terminal, Check, AlertTriangle } from "lucide-react";
+import { Download, Upload, Copy, FileJson, FileCode, FileText, Terminal, Check, AlertTriangle, Eye, Shield, Users as UsersIcon } from "lucide-react";
 import { useStore } from "../store/store";
 import { exportJSON, exportLuckPermsJSON, exportYAML, exportCommands, detectAndImport } from "../store/lpFormat";
 import { toast } from "sonner";
@@ -95,6 +95,13 @@ function ImportPanel({ onClose }: { onClose: () => void }) {
   const [mergeMode, setMergeMode] = useState<"replace" | "merge">("merge");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Live preview — parses on every keystroke (cheap, all in-memory)
+  const preview = useMemo(() => {
+    if (!text.trim()) return null;
+    try { return { ok: true as const, ...detectAndImport(text) }; }
+    catch (e: any) { return { ok: false as const, error: e.message }; }
+  }, [text]);
+
   const onFile = async (f?: File | null) => {
     if (!f) return;
     setText(await f.text());
@@ -155,25 +162,85 @@ function ImportPanel({ onClose }: { onClose: () => void }) {
             ))}
           </div>
         </div>
-        <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); onFile(e.dataTransfer.files[0]); }}
-          className="rounded-lg border-2 border-dashed border-border hover:border-primary/40 transition relative bg-input/20">
-          <textarea value={text} onChange={(e) => setText(e.target.value)}
-            placeholder="Paste JSON, YAML, or /lp commands here — or drop a file. Auto-detected on import."
-            className="w-full h-44 p-3 bg-transparent text-[11px] font-mono outline-none resize-none placeholder:text-muted-foreground/60" />
-          <div className="absolute top-2 right-2 flex items-center gap-1.5">
-            <button onClick={() => fileRef.current?.click()} className="flex items-center gap-1 px-2 py-1 rounded bg-card/80 border border-border text-[10px] hover:border-primary/40 transition">
-              <Upload className="w-2.5 h-2.5" /> File
-            </button>
+        <div className="grid grid-cols-2 gap-3">
+          <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); onFile(e.dataTransfer.files[0]); }}
+            className="rounded-lg border-2 border-dashed border-border hover:border-primary/40 transition relative bg-input/20">
+            <textarea value={text} onChange={(e) => setText(e.target.value)}
+              placeholder="Paste JSON, YAML, or /lp commands here — or drop a file. Auto-detected on import."
+              className="w-full h-56 p-3 bg-transparent text-[11px] font-mono outline-none resize-none placeholder:text-muted-foreground/60" />
+            <div className="absolute top-2 right-2 flex items-center gap-1.5">
+              <button onClick={() => fileRef.current?.click()} className="flex items-center gap-1 px-2 py-1 rounded bg-card/80 border border-border text-[10px] hover:border-primary/40 transition">
+                <Upload className="w-2.5 h-2.5" /> File
+              </button>
+            </div>
+            <input ref={fileRef} type="file" accept=".json,.yml,.yaml,.txt" hidden onChange={(e) => onFile(e.target.files?.[0])} />
           </div>
-          <input ref={fileRef} type="file" accept=".json,.yml,.yaml,.txt" hidden onChange={(e) => onFile(e.target.files?.[0])} />
+          <PreviewPane preview={preview} />
         </div>
       </div>
 
       <div className="flex items-center justify-end gap-2">
+        {preview?.ok && (
+          <span className="mr-auto text-[10px] font-mono text-muted-foreground">
+            <span className="text-primary">●</span> ready to {mergeMode}: {preview.groups.length} groups · {preview.users.length} users
+          </span>
+        )}
         <button onClick={onClose} className="px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground transition">Cancel</button>
-        <button onClick={doImport} className="glint flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold glow-green hover:glow-green-soft transition">
+        <button onClick={doImport} disabled={!preview?.ok} className="glint flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold glow-green hover:glow-green-soft transition disabled:opacity-40 disabled:pointer-events-none">
           <Check className="w-3 h-3" /> Import
         </button>
+      </div>
+    </div>
+  );
+}
+
+function PreviewPane({ preview }: { preview: any }) {
+  return (
+    <div className="rounded-lg border border-border bg-card/40 overflow-hidden flex flex-col h-56">
+      <div className="px-3 py-1.5 border-b border-border/60 flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+        <Eye className="w-3 h-3 text-primary" /> live preview
+        {preview?.ok && <span className="ml-auto px-1.5 py-0.5 rounded bg-primary/15 text-primary font-mono normal-case">{preview.format}</span>}
+      </div>
+      <div className="flex-1 overflow-y-auto p-2 text-[11px]">
+        {!preview && <div className="h-full grid place-items-center text-muted-foreground italic">Paste data to preview…</div>}
+        {preview?.ok === false && (
+          <div className="flex items-start gap-2 text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-2">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <div><div className="font-semibold">Cannot parse</div><div className="text-[10px] opacity-80">{preview.error}</div></div>
+          </div>
+        )}
+        {preview?.ok && (
+          <div className="space-y-2">
+            {preview.warnings?.length > 0 && (
+              <div className="flex items-start gap-1.5 text-warning text-[10px] p-1.5 rounded bg-warning/10 border border-warning/30">
+                <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" /> {preview.warnings.join("; ")}
+              </div>
+            )}
+            <div>
+              <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Shield className="w-3 h-3 text-primary" /> Groups · {preview.groups.length}</div>
+              <div className="flex flex-wrap gap-1">
+                {preview.groups.slice(0, 24).map((g: any) => (
+                  <motion.span key={g.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                    className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/30 text-primary font-mono text-[10px]">
+                    {g.name} <span className="opacity-60">·{g.permissions.length}</span>
+                  </motion.span>
+                ))}
+                {preview.groups.length > 24 && <span className="text-[10px] text-muted-foreground">+{preview.groups.length - 24} more</span>}
+              </div>
+            </div>
+            {preview.users.length > 0 && (
+              <div>
+                <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><UsersIcon className="w-3 h-3 text-info" /> Users · {preview.users.length}</div>
+                <div className="flex flex-wrap gap-1">
+                  {preview.users.slice(0, 16).map((u: any) => (
+                    <span key={u.id} className="px-1.5 py-0.5 rounded bg-info/10 border border-info/30 text-info font-mono text-[10px]">{u.username}</span>
+                  ))}
+                  {preview.users.length > 16 && <span className="text-[10px] text-muted-foreground">+{preview.users.length - 16}</span>}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,14 +2,16 @@ import { useMemo, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Asterisk, Sparkles, Ban } from "lucide-react";
-import { PLUGIN_REGISTRY } from "../data/plugins";
+import { PLUGIN_REGISTRY, ALL_PERMISSIONS } from "../data/plugins";
 import { useStore } from "../store/store";
+import { getConfig } from "../config";
 
 export function PermissionPicker({ ownerType, ownerId, existing }: { ownerType: "group"|"user"; ownerId: string; existing: Set<string> }) {
   const { addPermission } = useStore();
   const [q, setQ] = useState("");
   const [activePlugin, setActivePlugin] = useState<string>("ALL");
   const [open, setOpen] = useState(false);
+  const autocomplete = getConfig().ui.permissionAutocomplete;
 
   const groups = useMemo(() => {
     const ql = q.toLowerCase();
@@ -78,11 +80,38 @@ export function PermissionPicker({ ownerType, ownerId, existing }: { ownerType: 
           ))}
         </div>
         <div className="p-2 border-t border-border flex items-center gap-2">
-          <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => {
-            if (e.key === "Enter" && q && /^[\w*.-]+$/.test(q)) { add(q, undefined as any); setOpen(false); }
-          }} placeholder="…or type custom node + Enter" className="flex-1 h-7 px-2 text-xs font-mono bg-input border border-border rounded focus:border-primary outline-none" />
+          <CustomNodeInput value={q} onChange={setQ} autocomplete={autocomplete}
+            onSubmit={(node, plugin) => { if (node) { add(node, plugin || (undefined as any)); setOpen(false); } }} />
         </div>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function CustomNodeInput({ value, onChange, onSubmit, autocomplete }:
+  { value: string; onChange: (v: string) => void; onSubmit: (node: string, plugin?: string) => void; autocomplete: boolean }) {
+  const suggestions = useMemo(() => {
+    if (!autocomplete || !value.trim()) return [];
+    const ql = value.toLowerCase();
+    return ALL_PERMISSIONS.filter(p => p.node.toLowerCase().includes(ql)).slice(0, 6);
+  }, [value, autocomplete]);
+  return (
+    <div className="flex-1 relative">
+      <input value={value} onChange={(e) => onChange(e.target.value)} onKeyDown={(e) => {
+        if (e.key === "Enter" && value && /^[\w*.\-:]+$/.test(value)) onSubmit(value);
+      }} placeholder="…or type custom node + Enter" className="w-full h-7 px-2 text-xs font-mono bg-input border border-border rounded focus:border-primary outline-none" />
+      {suggestions.length > 0 && (
+        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-md border border-primary/30 bg-popover shadow-xl glow-green-soft overflow-hidden z-50 animate-fade-up">
+          {suggestions.map(s => (
+            <button key={s.node + s.plugin} onClick={() => onSubmit(s.node, s.plugin)}
+              className="w-full text-left px-2 py-1 text-[11px] font-mono flex items-center gap-2 hover:bg-primary/10 transition">
+              <Sparkles className="w-3 h-3 text-primary shrink-0" />
+              <span className="truncate">{s.node}</span>
+              <span className="ml-auto text-[9px] text-muted-foreground">{s.plugin}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

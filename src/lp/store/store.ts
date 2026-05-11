@@ -34,6 +34,8 @@ export type User = {
   permissions: PermissionNode[];
 };
 
+export type Track = { id: string; name: string; chain: string[] /* group ids */ };
+
 export type Selection =
   | { type: "group"; id: string }
   | { type: "user"; id: string }
@@ -43,6 +45,7 @@ export type Selection =
 type State = {
   groups: Group[];
   users: User[];
+  tracks: Track[];
   selection: Selection;
   history: { groups: Group[]; users: User[] }[];
   future: { groups: Group[]; users: User[] }[];
@@ -58,6 +61,9 @@ type State = {
   updatePermission: (ownerType: "group" | "user", ownerId: string, permId: string, patch: Partial<PermissionNode>) => void;
   deletePermission: (ownerType: "group" | "user", ownerId: string, permId: string) => void;
   toggleParent: (groupId: string, parentId: string) => void;
+  addTrack: (name: string) => void;
+  updateTrack: (id: string, patch: Partial<Track>) => void;
+  deleteTrack: (id: string) => void;
   undo: () => void;
   redo: () => void;
   loadDemoData: () => void;
@@ -121,6 +127,10 @@ export const useStore = create<State>()(
     (set, get) => ({
       groups: demoGroups(),
       users: demoUsers(),
+      tracks: [
+        { id: "tr_staff", name: "staff", chain: ["g_mod", "g_admin", "g_owner"] },
+        { id: "tr_donor", name: "donor", chain: ["g_default", "g_vip"] },
+      ],
       selection: { type: "group", id: "g_vip" },
       history: [],
       future: [],
@@ -173,6 +183,9 @@ export const useStore = create<State>()(
         pushHistory(set, get);
         set({ groups: get().groups.map(g => g.id === groupId ? { ...g, parents: g.parents.includes(parentId) ? g.parents.filter(p => p !== parentId) : [...g.parents, parentId] } : g) });
       },
+      addTrack: (name) => { pushHistory(set, get); set({ tracks: [...get().tracks, { id: "tr_" + uid(), name, chain: [] }] }); },
+      updateTrack: (id, patch) => { pushHistory(set, get); set({ tracks: get().tracks.map(t => t.id === id ? { ...t, ...patch } : t) }); },
+      deleteTrack: (id) => { pushHistory(set, get); set({ tracks: get().tracks.filter(t => t.id !== id) }); },
       undo: () => {
         const s = get(); const last = s.history[s.history.length - 1]; if (!last) return;
         set({ groups: last.groups, users: last.users, history: s.history.slice(0, -1), future: [...s.future, snap(s)] });
@@ -181,8 +194,8 @@ export const useStore = create<State>()(
         const s = get(); const next = s.future[s.future.length - 1]; if (!next) return;
         set({ groups: next.groups, users: next.users, future: s.future.slice(0, -1), history: [...s.history, snap(s)] });
       },
-      loadDemoData: () => set({ groups: demoGroups(), users: demoUsers(), selection: { type: "group", id: "g_vip" }, history: [], future: [] }),
-      reset: () => set({ groups: [], users: [], selection: null, history: [], future: [] }),
+      loadDemoData: () => set({ groups: demoGroups(), users: demoUsers(), tracks: [{ id: "tr_staff", name: "staff", chain: ["g_mod","g_admin","g_owner"] }], selection: { type: "group", id: "g_vip" }, history: [], future: [] }),
+      reset: () => set({ groups: [], users: [], tracks: [], selection: null, history: [], future: [] }),
       loadData: (groups, users) => { pushHistory(set, get); set({ groups, users, selection: null }); },
       mergeData: (groups, users) => {
         pushHistory(set, get);
@@ -194,7 +207,7 @@ export const useStore = create<State>()(
         set({ groups: merged, users: mergedU });
       },
     }),
-    { name: "luckperms-visual-tree", partialize: (s) => ({ groups: s.groups, users: s.users }) }
+    { name: "luckperms-visual-tree", partialize: (s) => ({ groups: s.groups, users: s.users, tracks: s.tracks }) }
   )
 );
 

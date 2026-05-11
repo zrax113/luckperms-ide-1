@@ -15,7 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useStore } from "@/lp/store/store";
 import { validateAll } from "@/lp/store/validation";
 import { loadConfig, onConfigChange, getConfig } from "@/lp/config";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "react-resizable-panels";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Database, GitBranch, Shield, Users } from "lucide-react";
 
@@ -89,13 +89,13 @@ function Index() {
         <PanelGroup direction="horizontal" autoSaveId="lpvt-h-layout">
           {leftOpen && (
             <>
-              <Panel id="left" defaultSize={16} minSize={10} maxSize={30} order={1}>
+              <Panel id="left" defaultSize={16} minSize={10} maxSize={30}>
                 <Sidebar onOpenDialog={(k) => setDialog(k)} />
               </Panel>
               <ResizeBar />
             </>
           )}
-          <Panel id="main" minSize={30} order={2}>
+          <Panel id="main" minSize={30}>
             <PanelGroup direction="vertical" autoSaveId="lpvt-v-layout">
               <Panel id="tree" defaultSize={panelOpen ? 62 : 96} minSize={20}>
                 <main className="h-full flex flex-col overflow-hidden bg-background relative">
@@ -113,7 +113,7 @@ function Index() {
           {rightOpen && (
             <>
               <ResizeBar />
-              <Panel id="right" defaultSize={20} minSize={14} maxSize={36} order={3}>
+              <Panel id="right" defaultSize={20} minSize={14} maxSize={36}>
                 <Inspector />
               </Panel>
             </>

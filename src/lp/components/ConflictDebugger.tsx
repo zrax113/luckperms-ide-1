@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, GitBranch, Bug, Layers, Filter, ArrowRight, ShieldAlert, Sparkles, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, GitBranch, Bug, Layers, Filter, ArrowRight, ShieldAlert, Sparkles, CheckCircle2, Wand2, Zap } from "lucide-react";
 import { useStore, resolveEffectivePermissions } from "../store/store";
-import { validateAll, type Issue } from "../store/validation";
+import { validateAll } from "../store/validation";
+import { toast } from "sonner";
 
 type Conflict = {
   kind: "override" | "deny-vs-allow" | "wildcard-shadow" | "circular" | "duplicate" | "unreachable";
@@ -14,10 +15,13 @@ type Conflict = {
   node: string;
   message: string;
   trace: string[];
+  permId?: string;
+  fix?: () => void;
+  fixLabel?: string;
 };
 
 export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
-  const { groups, users, setSelection } = useStore();
+  const { groups, users, setSelection, deletePermission, updateGroup } = useStore();
   const [filter, setFilter] = useState<"all" | "error" | "warning" | "info">("all");
   const [scope, setScope] = useState<"all" | "group" | "user">("all");
 
@@ -37,10 +41,21 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
         /redundant/i.test(i.message) ? "wildcard-shadow" :
         /conflict/i.test(i.message) ? "deny-vs-allow" :
         "duplicate";
+      const permId = i.permId;
+      let fix: (() => void) | undefined;
+      let fixLabel: string | undefined;
+      if (kind === "circular") {
+        const g = groups.find(x => x.id === owner.id);
+        if (g && g.parents.length) { fix = () => updateGroup(g.id, { parents: [] }); fixLabel = "Clear parents"; }
+      } else if ((kind === "duplicate" || kind === "wildcard-shadow") && permId) {
+        fix = () => deletePermission(ownerType, owner.id, permId); fixLabel = "Remove perm";
+      } else if (kind === "deny-vs-allow" && permId) {
+        fix = () => deletePermission(ownerType, owner.id, permId); fixLabel = "Remove deny";
+      }
       out.push({
-        kind, level: i.level, ownerType, ownerId: owner.id, node,
+        kind, level: i.level, ownerType, ownerId: owner.id, node, permId,
         ownerName: ownerType === "group" ? (owner as any).name : (owner as any).username,
-        message: i.message, trace: [],
+        message: i.message, trace: [], fix, fixLabel,
       });
     }
 
@@ -48,7 +63,7 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
     for (const g of groups) {
       const eff = resolveEffectivePermissions(groups, "group", g.id);
       const directNodes = new Set(g.permissions.map(p => p.node));
-      eff.forEach((info, node) => {
+          eff.forEach((info, node) => {
         if (directNodes.has(node)) {
           const direct = g.permissions.find(p => p.node === node)!;
           if (direct.value !== info.value && info.from !== g.name) {
@@ -78,6 +93,9 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
               kind: "wildcard-shadow", level: "info", ownerType: "user", ownerId: u.id, ownerName: u.username, node: p.node,
               message: `"${p.node}" already covered by inherited wildcard "${wc}" from ${merged.get(wc)?.from}`,
               trace: [merged.get(wc)?.from || "", u.username],
+              permId: p.id,
+              fix: () => deletePermission("user", u.id, p.id),
+              fixLabel: "Remove redundant",
             });
           }
         }
@@ -85,7 +103,14 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
     }
 
     return out;
-  }, [groups, users]);
+  }, [groups, users, updateGroup, deletePermission]);
+
+  const fixAll = () => {
+    const fixable = conflicts.filter(c => c.fix);
+    if (!fixable.length) { toast.info("Nothing to auto-fix"); return; }
+    fixable.forEach(c => c.fix!());
+    toast.success(`Auto-fixed ${fixable.length} issue${fixable.length === 1 ? "" : "s"}`);
+  };
 
   const filtered = conflicts.filter(c =>
     (filter === "all" || c.level === filter) &&
@@ -108,6 +133,11 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
             <span>Conflict Debugger</span>
             <span className="text-[10px] font-mono text-muted-foreground ml-1">·  {conflicts.length} issue{conflicts.length===1?"":"s"} detected</span>
             <div className="ml-auto flex items-center gap-2 text-xs">
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={fixAll}
+                disabled={!conflicts.some(c => c.fix)}
+                className="glint flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/15 text-primary border border-primary/40 text-[11px] font-semibold hover:bg-primary/25 disabled:opacity-40 disabled:hover:bg-primary/15 transition">
+                <Wand2 className="w-3 h-3" /> Auto-fix all
+              </motion.button>
               <Pill icon={<ShieldAlert className="w-3 h-3" />} label={String(counts.error)} color="destructive" active={filter==="error"} onClick={() => setFilter(filter==="error"?"all":"error")} />
               <Pill icon={<AlertTriangle className="w-3 h-3" />} label={String(counts.warning)} color="warning" active={filter==="warning"} onClick={() => setFilter(filter==="warning"?"all":"warning")} />
               <Pill icon={<Sparkles className="w-3 h-3" />} label={String(counts.info)} color="info" active={filter==="info"} onClick={() => setFilter(filter==="info"?"all":"info")} />
@@ -140,8 +170,7 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
               </motion.div>
             )}
             {filtered.map((c, idx) => (
-              <motion.button key={idx} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
-                onClick={() => { setSelection({ type: c.ownerType, id: c.ownerId } as any); onOpenChange(false); }}
+              <motion.div key={idx} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
                 className={`w-full text-left flex items-start gap-3 p-3 rounded-md border transition group hover:bg-accent/40 ${
                   c.level === "error" ? "border-destructive/30 bg-destructive/5" :
                   c.level === "warning" ? "border-warning/30 bg-warning/5" :
@@ -157,7 +186,7 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
                    c.kind === "override" ? <ArrowRight className="w-3.5 h-3.5" /> :
                    <AlertTriangle className="w-3.5 h-3.5" />}
                 </div>
-                <div className="flex-1 min-w-0">
+                <button onClick={() => { setSelection({ type: c.ownerType, id: c.ownerId } as any); onOpenChange(false); }} className="flex-1 min-w-0 text-left">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{c.kind.replace("-", " ")}</span>
                     <span className="text-[10px] uppercase tracking-wider font-mono px-1.5 py-0.5 rounded bg-muted">{c.ownerType}</span>
@@ -175,9 +204,15 @@ export function ConflictDebugger({ open, onOpenChange }: { open: boolean; onOpen
                       ))}
                     </div>
                   )}
-                </div>
-                <div className="text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition self-center">jump →</div>
-              </motion.button>
+                </button>
+                {c.fix && (
+                  <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                    onClick={(e) => { e.stopPropagation(); c.fix!(); toast.success(c.fixLabel || "Fixed"); }}
+                    className="glint shrink-0 self-center flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold bg-primary/15 text-primary border border-primary/40 hover:bg-primary/25 transition">
+                    <Zap className="w-3 h-3" /> {c.fixLabel}
+                  </motion.button>
+                )}
+              </motion.div>
             ))}
           </AnimatePresence>
         </div>

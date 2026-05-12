@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Undo2, Redo2, Search, Download, Upload, FlaskConical, Package, Settings, Zap, GitBranch, Bug, HelpCircle, PanelLeft, PanelRight } from "lucide-react";
+import { Undo2, Redo2, Search, Download, Upload, FlaskConical, Package, Settings, Zap, GitBranch, Bug, HelpCircle, PanelLeft, PanelRight, PlusCircle, UserPlus } from "lucide-react";
 import { useStore } from "../store/store";
 import { Button } from "@/components/ui/button";
 import { getConfig } from "../config";
@@ -7,8 +7,9 @@ import { getConfig } from "../config";
 type DialogKey = "simulator" | "plugins" | "graph" | "search" | "import" | "export" | "debugger" | "settings" | "tutorial";
 
 export function TopBar({ onOpen, onToggleLeft, onToggleRight }: { onOpen: (k: DialogKey) => void; onToggleLeft: () => void; onToggleRight: () => void }) {
-  const { undo, redo, history, future } = useStore();
+  const { undo, redo, history, future, addGroup, addUser } = useStore();
   const brand = getConfig().brand;
+  const makeQuickName = (prefix: string) => `${prefix}_${Math.random().toString(36).slice(2, 6)}`;
   return (
     <div className="h-11 border-b border-border bg-titlebar/80 glass flex items-center px-2 gap-1 select-none relative z-30">
       <Button variant="ghost" size="icon" onClick={onToggleLeft} title="Toggle explorer" className="h-7 w-7"><PanelLeft className="w-3.5 h-3.5" /></Button>
@@ -29,6 +30,8 @@ export function TopBar({ onOpen, onToggleLeft, onToggleRight }: { onOpen: (k: Di
       <button onClick={() => onOpen("search")} className="glint flex items-center gap-2 h-7 px-2.5 rounded-md bg-input/60 border border-border text-xs text-muted-foreground flex-1 max-w-72 min-w-0 hover:bg-input hover:border-primary/40 transition">
         <Search className="w-3 h-3 shrink-0" /> <span className="truncate">Search permissions, groups, users…</span> <span className="ml-auto font-mono text-[10px] opacity-60 hidden md:inline">⌘K</span>
       </button>
+      <NavBtn icon={PlusCircle} label="New Group" onClick={() => addGroup(makeQuickName("group"))} hideLabelOn="lg" />
+      <NavBtn icon={UserPlus} label="New User" onClick={() => addUser(makeQuickName("user"))} hideLabelOn="lg" />
       <div className="ml-auto flex items-center gap-0.5">
         <NavBtn icon={GitBranch} label="Graph" onClick={() => onOpen("graph")} hideLabelOn="md" />
         <NavBtn icon={FlaskConical} label="Simulator" onClick={() => onOpen("simulator")} hideLabelOn="md" />

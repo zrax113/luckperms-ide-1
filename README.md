@@ -31,6 +31,7 @@
 - Group → User connections add members instantly
 - Animated dashed edges show direction of inheritance
 - Mini-map, fit-to-view, and grid background
+- Quick action buttons on the dashboard let you create new groups or users instantly
 
 ### 🧠 Conflict Debugger (one-click fix)
 - Detects circular inheritance, deny-vs-allow conflicts, duplicate nodes, wildcard shadowing
@@ -175,24 +176,56 @@ This app is a static-friendly TanStack Start project — it works on any modern 
 
 ### Vercel
 ```bash
-bun add -g vercel
-vercel
+npm install
+npm install -g vercel
+vercel login
+vercel --prod
 ```
-Vercel auto-detects the Vite config. No env vars are required.
+If Vercel does not auto-detect the build, use the `vercel-build` script:
+```bash
+npx vercel --prod --build-command "npm run vercel-build" --output dist
+```
+
+This repo also includes `vercel.json` with a SPA fallback:
+- `@vercel/static-build` for the Vite output
+- `routes` with `handle: filesystem` so static assets are served first
+- index fallback for client-side routing
 
 ### Netlify
+This repository includes a `netlify.toml` file that configures the deploy output and SPA fallback. Use Netlify if you want a non-Vercel static host.
+
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
+```
+
+Deploy from the command line:
 ```bash
-bun run build
-# then drag-and-drop the `dist/` folder into Netlify, or:
+npm run build
 netlify deploy --prod --dir=dist
 ```
 
-### Cloudflare Pages
+### Fallback hosting (if Vercel fails)
+Use any static host by building locally and deploying `dist/`.
+
+#### Cloudflare Pages
 ```bash
-bun run build
+npm run build
 wrangler pages deploy dist
 ```
-The included `wrangler.jsonc` ships ready for Workers/Pages with `nodejs_compat`.
+
+#### Manual deploy
+Build locally and upload the `dist/` folder to any static host or file server.
+```bash
+npm run build
+```
 
 ### Docker (any VPS)
 ```dockerfile

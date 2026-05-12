@@ -1,6 +1,20 @@
 import React, { useState, useMemo, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Users, Shield, GitBranch, Package, FileText, Plus, Trash2, Copy, Search, Layers, ArrowRight, Zap } from "lucide-react";
+import {
+  ChevronRight,
+  Users,
+  Shield,
+  GitBranch,
+  Package,
+  FileText,
+  Plus,
+  Trash2,
+  Copy,
+  Search,
+  Layers,
+  ArrowRight,
+  Zap,
+} from "lucide-react";
 import { useStore } from "../store/store";
 import { PLUGIN_REGISTRY } from "../data/plugins";
 import { TEMPLATES } from "../data/templates";
@@ -14,14 +28,16 @@ const SectionHeader = memo(function SectionHeader({
   count,
   isOpen,
   onToggle,
-  action
+  action,
 }: any) {
   return (
     <button
       onClick={onToggle}
       className="w-full px-2 py-2 flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground hover:text-foreground hover:bg-accent/30 transition-all duration-200"
     >
-      <ChevronRight className={`w-3 h-3 transition-transform duration-300 flex-shrink-0 ${isOpen ? "rotate-90" : ""}`} />
+      <ChevronRight
+        className={`w-3 h-3 transition-transform duration-300 flex-shrink-0 ${isOpen ? "rotate-90" : ""}`}
+      />
       <Icon className="w-3 h-3 flex-shrink-0 text-primary/70 group-hover:text-primary transition-colors" />
       <span className="truncate">{title}</span>
       {count !== undefined && (
@@ -35,16 +51,16 @@ const SectionHeader = memo(function SectionHeader({
 });
 
 // Memoized Section Container
-const Section = memo(function Section({ 
-  title, 
-  icon, 
-  count, 
+const Section = memo(function Section({
+  title,
+  icon,
+  count,
   children,
   defaultOpen = true,
-  action 
+  action,
 }: any) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  
+
   return (
     <div className="border-b border-border/40">
       <SectionHeader
@@ -78,7 +94,7 @@ const GroupItemRow = memo(function GroupItemRow({
   isActive,
   onSelect,
   onClone,
-  onDelete
+  onDelete,
 }: any) {
   return (
     <button
@@ -120,12 +136,7 @@ const GroupItemRow = memo(function GroupItemRow({
 });
 
 // Memoized User Item
-const UserItemRow = memo(function UserItemRow({
-  user,
-  isActive,
-  onSelect,
-  onDelete
-}: any) {
+const UserItemRow = memo(function UserItemRow({ user, isActive, onSelect, onDelete }: any) {
   return (
     <button
       onClick={() => onSelect(user.id)}
@@ -164,7 +175,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
     deleteUser,
     cloneGroup,
     mergeData,
-    addPermission
+    addPermission,
   } = useStore();
   const [query, setQuery] = useState("");
 
@@ -174,12 +185,12 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
       groups
         .filter((g) => g.name.toLowerCase().includes(query.toLowerCase()))
         .sort((a, b) => b.weight - a.weight),
-    [groups, query]
+    [groups, query],
   );
 
   const filteredUsers = useMemo(
     () => users.filter((u) => u.username.toLowerCase().includes(query.toLowerCase())),
-    [users, query]
+    [users, query],
   );
 
   // Memoized handlers
@@ -187,7 +198,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
     const name = await showPrompt({
       title: "New group",
       placeholder: "e.g. moderator",
-      submitLabel: "Create group"
+      submitLabel: "Create group",
     });
     if (name) {
       addGroup(name);
@@ -199,7 +210,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
     const name = await showPrompt({
       title: "New user",
       placeholder: "Minecraft username",
-      submitLabel: "Create user"
+      submitLabel: "Create user",
     });
     if (name) {
       addUser(name);
@@ -209,12 +220,12 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
 
   const handleSelectGroup = useCallback(
     (id: string) => setSelection({ type: "group", id }),
-    [setSelection]
+    [setSelection],
   );
 
   const handleSelectUser = useCallback(
     (id: string) => setSelection({ type: "user", id }),
-    [setSelection]
+    [setSelection],
   );
 
   const handleCloneGroup = useCallback(
@@ -222,7 +233,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
       cloneGroup(id);
       toast.success("Group cloned");
     },
-    [cloneGroup]
+    [cloneGroup],
   );
 
   const handleDeleteGroup = useCallback(
@@ -231,7 +242,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
       deleteGroup(id);
       toast.success(`Deleted ${group?.name}`);
     },
-    [deleteGroup, groups]
+    [deleteGroup, groups],
   );
 
   const handleDeleteUser = useCallback(
@@ -240,7 +251,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
       deleteUser(id);
       toast.success(`Deleted ${user?.username}`);
     },
-    [deleteUser, users]
+    [deleteUser, users],
   );
 
   const handleLoadTemplate = useCallback(
@@ -249,10 +260,10 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
       if (!template) return;
       mergeData(structuredClone(template.groups), structuredClone(template.users));
       toast.success(`Template merged: ${template.name}`, {
-        description: `${template.groups.length} groups added`
+        description: `${template.groups.length} groups added`,
       });
     },
-    [mergeData]
+    [mergeData],
   );
 
   const handleImportPlugin = useCallback(
@@ -265,13 +276,11 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
         title: `Import all "${pluginName}" perms into…`,
         placeholder: groups[0].name,
         defaultValue: groups[0].name,
-        submitLabel: "Import"
+        submitLabel: "Import",
       });
       if (!target) return;
 
-      const group = groups.find(
-        (g) => g.name.toLowerCase() === target.toLowerCase()
-      );
+      const group = groups.find((g) => g.name.toLowerCase() === target.toLowerCase());
       if (!group) {
         toast.error(`Group "${target}" not found`);
         return;
@@ -292,7 +301,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
 
       toast.success(`Imported ${added} ${pluginName} perms into ${group.name}`);
     },
-    [groups, addPermission]
+    [groups, addPermission],
   );
 
   return (
@@ -413,15 +422,10 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
         </Section>
 
         {/* Tracks Section */}
-        <Section
-          title="Tracks"
-          icon={GitBranch}
-          count={2}
-          defaultOpen={false}
-        >
+        <Section title="Tracks" icon={GitBranch} count={2} defaultOpen={false}>
           {[
             { name: "staff", chain: ["helper", "moderator", "admin"] },
-            { name: "donor", chain: ["vip", "mvp", "legend"] }
+            { name: "donor", chain: ["vip", "mvp", "legend"] },
           ].map((track) => (
             <div
               key={track.name}
@@ -443,12 +447,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
         </Section>
 
         {/* Plugins Section */}
-        <Section
-          title="Plugins"
-          icon={Package}
-          count={PLUGIN_REGISTRY.length}
-          defaultOpen={true}
-        >
+        <Section title="Plugins" icon={Package} count={PLUGIN_REGISTRY.length} defaultOpen={true}>
           <div className="space-y-0.5">
             {PLUGIN_REGISTRY.map((plugin) => (
               <div
@@ -463,10 +462,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
                   {plugin.plugin}
                 </span>
                 <span className="text-[8px] font-mono text-muted-foreground flex-shrink-0">
-                  {plugin.categories.reduce(
-                    (sum, cat) => sum + cat.permissions.length,
-                    0
-                  )}
+                  {plugin.categories.reduce((sum, cat) => sum + cat.permissions.length, 0)}
                 </span>
                 <button
                   onClick={() => handleImportPlugin(plugin.plugin)}
@@ -487,12 +483,7 @@ export function Sidebar({ onOpenDialog }: { onOpenDialog: (k: "plugins") => void
         </Section>
 
         {/* Templates Section */}
-        <Section
-          title="Templates"
-          icon={FileText}
-          count={TEMPLATES.length}
-          defaultOpen={false}
-        >
+        <Section title="Templates" icon={FileText} count={TEMPLATES.length} defaultOpen={false}>
           <div className="space-y-1">
             {TEMPLATES.map((template) => (
               <button

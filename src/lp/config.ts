@@ -2,13 +2,25 @@ import { PLUGIN_REGISTRY, ALL_PERMISSIONS, type PluginRegistry } from "./data/pl
 
 export type AppConfig = {
   brand: { name: string; tagline: string; accent: string; logo: string };
-  ui: { showOnboarding: boolean; compactMode: boolean; defaultPanelOpen: boolean; permissionAutocomplete: boolean; backgroundAnim: boolean };
+  ui: {
+    showOnboarding: boolean;
+    compactMode: boolean;
+    defaultPanelOpen: boolean;
+    permissionAutocomplete: boolean;
+    backgroundAnim: boolean;
+  };
   extraPlugins: PluginRegistry[];
 };
 
 const DEFAULT: AppConfig = {
   brand: { name: "LuckPerms Visual Tree", tagline: "studio · 1.0", accent: "#22e08c", logo: "⚡" },
-  ui: { showOnboarding: true, compactMode: true, defaultPanelOpen: true, permissionAutocomplete: true, backgroundAnim: true },
+  ui: {
+    showOnboarding: true,
+    compactMode: true,
+    defaultPanelOpen: true,
+    permissionAutocomplete: true,
+    backgroundAnim: true,
+  },
   extraPlugins: [],
 };
 
@@ -16,20 +28,25 @@ let _config: AppConfig = DEFAULT;
 let _loaded = false;
 let _listeners: (() => void)[] = [];
 
-export function getConfig(): AppConfig { return _config; }
+export function getConfig(): AppConfig {
+  return _config;
+}
 
 export function onConfigChange(fn: () => void) {
   _listeners.push(fn);
-  return () => { _listeners = _listeners.filter(x => x !== fn); };
+  return () => {
+    _listeners = _listeners.filter((x) => x !== fn);
+  };
 }
 
 function applyExtras(extras: PluginRegistry[]) {
   for (const p of extras) {
-    if (PLUGIN_REGISTRY.find(x => x.plugin === p.plugin)) continue;
+    if (PLUGIN_REGISTRY.find((x) => x.plugin === p.plugin)) continue;
     PLUGIN_REGISTRY.push(p);
-    for (const c of p.categories) for (const perm of c.permissions) {
-      ALL_PERMISSIONS.push({ ...perm, plugin: p.plugin } as any);
-    }
+    for (const c of p.categories)
+      for (const perm of c.permissions) {
+        ALL_PERMISSIONS.push({ ...perm, plugin: p.plugin } as any);
+      }
   }
 }
 
@@ -42,31 +59,42 @@ export async function loadConfig() {
     const res = await fetch("/config.json");
     if (res.ok) {
       const remote = await res.json();
-      _config = { ...DEFAULT, ...remote, brand: { ...DEFAULT.brand, ...(remote.brand||{}) }, ui: { ...DEFAULT.ui, ...(remote.ui||{}) } };
+      _config = {
+        ...DEFAULT,
+        ...remote,
+        brand: { ...DEFAULT.brand, ...(remote.brand || {}) },
+        ui: { ...DEFAULT.ui, ...(remote.ui || {}) },
+      };
     }
   } catch {}
   if (localRaw) {
     try {
       const local = JSON.parse(localRaw);
-      _config = { ..._config, ...local, brand: { ..._config.brand, ...(local.brand||{}) }, ui: { ..._config.ui, ...(local.ui||{}) } };
+      _config = {
+        ..._config,
+        ...local,
+        brand: { ..._config.brand, ...(local.brand || {}) },
+        ui: { ..._config.ui, ...(local.ui || {}) },
+      };
     } catch {}
   }
   applyExtras(_config.extraPlugins || []);
   applyAccent(_config.brand.accent);
-  _listeners.forEach(fn => fn());
+  _listeners.forEach((fn) => fn());
   return _config;
 }
 
 export function updateConfig(patch: Partial<AppConfig>) {
   _config = {
-    ..._config, ...patch,
-    brand: { ..._config.brand, ...(patch.brand||{}) },
-    ui: { ..._config.ui, ...(patch.ui||{}) },
+    ..._config,
+    ...patch,
+    brand: { ..._config.brand, ...(patch.brand || {}) },
+    ui: { ..._config.ui, ...(patch.ui || {}) },
   };
   if (patch.brand?.accent) applyAccent(patch.brand.accent);
   if (patch.extraPlugins) applyExtras(patch.extraPlugins);
   if (typeof window !== "undefined") localStorage.setItem("lpvt-config", JSON.stringify(_config));
-  _listeners.forEach(fn => fn());
+  _listeners.forEach((fn) => fn());
 }
 
 // hex -> CSS variable (with oklch fallback for consistency)

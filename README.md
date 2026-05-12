@@ -25,6 +25,7 @@
 ## Features
 
 ### 🌳 Family-Tree Visualization
+
 - Real React-Flow canvas with hierarchical, weight-driven layout
 - Drag handles between nodes to **create inheritance** in one motion
 - Group → Group connections create parent-child links
@@ -34,20 +35,24 @@
 - Quick action buttons on the dashboard let you create new groups or users instantly
 
 ### 🧠 Conflict Debugger (one-click fix)
+
 - Detects circular inheritance, deny-vs-allow conflicts, duplicate nodes, wildcard shadowing
 - Each issue offers a contextual **"⚡ Auto-fix"** button
 - "Auto-fix all" sweeps the entire workspace
 - Live error/warning counts in the status bar
 
 ### 🪄 No-Code Permission Picker
+
 - Searchable popover across all registered plugins
 - Permission **autocomplete** (toggleable in Settings) when typing custom nodes
 - Visual indicators for wildcards, denies, and temporary nodes
 
 ### 🔌 Built-In Plugin Registry
+
 EssentialsX · WorldEdit · WorldGuard · LuckPerms · LiteBans · CoreProtect · mcMMO · DiscordSRV · TAB · Towny · Vault · PlaceholderAPI · Multiverse · ProtocolLib · GriefPrevention · Citizens · ChestShop · SuperVanish · Skript · ViaVersion — and you can register your own via `config.json` or the in-app Settings.
 
 ### 📥 Import / Export with Live Preview
+
 - **Visual Tree JSON** — full project save/restore
 - **LuckPerms JSON** — drop-in compatible with `/lp import`
 - **YAML** — human-readable config (parses LP-style and `plugin.yml`)
@@ -56,6 +61,7 @@ EssentialsX · WorldEdit · WorldGuard · LuckPerms · LiteBans · CoreProtect �
 - Templates (Survival, SMP, Network, Minigames…) — merge into any project, never wipes existing groups
 
 ### 🎨 Modern, Premium UI
+
 - Graphite + neon green palette with subtle glints, soft glows, animated gradient background
 - Resizable, toggleable sidebars and bottom dock (`⌘B`, `⌘/`)
 - Custom modal/prompt system — no native browser `alert()` or `prompt()`
@@ -63,12 +69,15 @@ EssentialsX · WorldEdit · WorldGuard · LuckPerms · LiteBans · CoreProtect �
 - Onboarding tour for first-time users + replayable from Settings
 
 ### 🧪 Permission Simulator
+
 Pick a user + permission node + world, get an instant verdict — with the exact reason chain (which group, which weight, which wildcard matched).
 
 ### ⚙️ Customizable Branding
+
 Edit `public/config.json` or use the in-app **Settings → Branding** panel to change the app name, accent color, tagline, and add custom plugins.
 
 ### ⚡ Performance
+
 - Memoized validation & layout computation
 - Virtualized-ready permission lists
 - Persisted state via `localStorage` (instant cold start)
@@ -99,14 +108,14 @@ The dev server starts on `http://localhost:8080`. Open the app, hit the onboardi
     "name": "Acme Network Permissions",
     "tagline": "internal staff tool",
     "accent": "#22e08c",
-    "logo": "⚡"
+    "logo": "⚡",
   },
   "ui": {
     "showOnboarding": true,
     "compactMode": true,
     "defaultPanelOpen": true,
     "permissionAutocomplete": true,
-    "backgroundAnim": true
+    "backgroundAnim": true,
   },
   "extraPlugins": [
     {
@@ -120,12 +129,12 @@ The dev server starts on `http://localhost:8080`. Open the app, hit the onboardi
           "permissions": [
             { "node": "myplugin.use", "description": "Use the plugin", "default": "true" },
             { "node": "myplugin.admin", "description": "Admin commands", "default": "op" },
-            { "node": "myplugin.*", "description": "All myplugin perms", "wildcard": true }
-          ]
-        }
-      ]
-    }
-  ]
+            { "node": "myplugin.*", "description": "All myplugin perms", "wildcard": true },
+          ],
+        },
+      ],
+    },
+  ],
 }
 ```
 
@@ -135,12 +144,12 @@ User-level overrides (per browser) are stored in `localStorage` under `lpvt-conf
 
 ## Importing & Exporting
 
-| Format            | Round-trip | Use case                              |
-| ----------------- | ---------- | ------------------------------------- |
-| Visual Tree JSON  | ✅          | Backups, version control              |
-| LuckPerms JSON    | ✅          | Drop into `/lp import`                |
-| YAML              | ⚠️ partial | Manual editing, plugin.yml ingestion |
-| /lp commands      | ⚠️ one-way | Paste in console / setup scripts      |
+| Format           | Round-trip | Use case                             |
+| ---------------- | ---------- | ------------------------------------ |
+| Visual Tree JSON | ✅         | Backups, version control             |
+| LuckPerms JSON   | ✅         | Drop into `/lp import`               |
+| YAML             | ⚠️ partial | Manual editing, plugin.yml ingestion |
+| /lp commands     | ⚠️ one-way | Paste in console / setup scripts     |
 
 **Tip:** use **merge mode** when applying templates — existing groups keep their permissions, new groups are added with re-mapped IDs and de-duplicated permission nodes.
 
@@ -159,14 +168,14 @@ New permissions immediately appear in the picker, simulator, and importer.
 
 ## Keyboard Shortcuts
 
-| Shortcut          | Action                  |
-| ----------------- | ----------------------- |
-| `⌘K` / `Ctrl K`   | Search                  |
-| `⌘Z` / `Ctrl Z`   | Undo                    |
-| `⇧⌘Z` / `Ctrl ⇧Z` | Redo                    |
-| `⌘B` / `Ctrl B`   | Toggle left explorer    |
-| `⌘/` / `Ctrl /`   | Toggle right inspector  |
-| `Esc`             | Close any modal         |
+| Shortcut          | Action                 |
+| ----------------- | ---------------------- |
+| `⌘K` / `Ctrl K`   | Search                 |
+| `⌘Z` / `Ctrl Z`   | Undo                   |
+| `⇧⌘Z` / `Ctrl ⇧Z` | Redo                   |
+| `⌘B` / `Ctrl B`   | Toggle left explorer   |
+| `⌘/` / `Ctrl /`   | Toggle right inspector |
+| `Esc`             | Close any modal        |
 
 ---
 
@@ -175,23 +184,28 @@ New permissions immediately appear in the picker, simulator, and importer.
 This app is a static-friendly TanStack Start project — it works on any modern host.
 
 ### Vercel
+
 ```bash
 npm install
 npm install -g vercel
 vercel login
 vercel --prod
 ```
+
 If Vercel does not auto-detect the build, use the `vercel-build` script:
+
 ```bash
 npx vercel --prod --build-command "npm run vercel-build" --output dist
 ```
 
 This repo also includes `vercel.json` with a SPA fallback:
+
 - `@vercel/static-build` for the Vite output
 - `routes` with `handle: filesystem` so static assets are served first
 - index fallback for client-side routing
 
 ### Netlify
+
 This repository includes a `netlify.toml` file that configures the deploy output and SPA fallback. Use Netlify if you want a non-Vercel static host.
 
 ```toml
@@ -207,27 +221,33 @@ This repository includes a `netlify.toml` file that configures the deploy output
 ```
 
 Deploy from the command line:
+
 ```bash
 npm run build
 netlify deploy --prod --dir=dist
 ```
 
 ### Fallback hosting (if Vercel fails)
+
 Use any static host by building locally and deploying `dist/`.
 
 #### Cloudflare Pages
+
 ```bash
 npm run build
 wrangler pages deploy dist
 ```
 
 #### Manual deploy
+
 Build locally and upload the `dist/` folder to any static host or file server.
+
 ```bash
 npm run build
 ```
 
 ### Docker (any VPS)
+
 ```dockerfile
 FROM oven/bun:1 as builder
 WORKDIR /app
@@ -237,12 +257,14 @@ RUN bun install && bun run build
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 ```
+
 ```bash
 docker build -t lpvt .
 docker run -p 80:80 lpvt
 ```
 
 ### GitHub Pages
+
 ```bash
 bun run build
 # push the contents of dist/ to a `gh-pages` branch

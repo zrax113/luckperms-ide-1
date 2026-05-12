@@ -19,20 +19,39 @@ import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "reac
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Database, GitBranch, Shield, Users } from "lucide-react";
 import { toast } from "sonner";
+import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS } from "@/hooks/useKeyboard";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "LuckPerms Visual Tree — Family-Tree Permission Studio" },
-      { name: "description", content: "Drag-and-drop visual permission management for Minecraft LuckPerms — edit groups, users, inheritance, and plugin permissions in a modern family tree." },
+      {
+        name: "description",
+        content:
+          "Drag-and-drop visual permission management for Minecraft LuckPerms — edit groups, users, inheritance, and plugin permissions in a modern family tree.",
+      },
       { property: "og:title", content: "LuckPerms Visual Tree" },
-      { property: "og:description", content: "A modern family-tree IDE for managing LuckPerms groups, users, and inheritance visually." },
+      {
+        property: "og:description",
+        content:
+          "A modern family-tree IDE for managing LuckPerms groups, users, and inheritance visually.",
+      },
     ],
   }),
   component: Index,
 });
 
-type DialogKey = null | "simulator" | "plugins" | "graph" | "search" | "import" | "export" | "debugger" | "settings" | "tutorial";
+type DialogKey =
+  | null
+  | "simulator"
+  | "plugins"
+  | "graph"
+  | "search"
+  | "import"
+  | "export"
+  | "debugger"
+  | "settings"
+  | "tutorial";
 
 function Index() {
   const [dialog, setDialog] = useState<DialogKey>(null);
@@ -42,43 +61,42 @@ function Index() {
   const [, force] = useState(0);
   const { undo, redo, groups, users } = useStore();
   const issues = useMemo(() => validateAll(groups, users), [groups, users]);
-  const errors = issues.filter(i => i.level === "error").length;
-  const warnings = issues.filter(i => i.level === "warning").length;
+  const errors = issues.filter((i) => i.level === "error").length;
+  const warnings = issues.filter((i) => i.level === "warning").length;
 
   useEffect(() => {
     loadConfig().then(() => {
-      force(x => x + 1);
+      force((x) => x + 1);
       const cfg = getConfig();
       if (cfg.ui.showOnboarding && !localStorage.getItem("lpvt-onboarded")) {
         setTimeout(() => setDialog("tutorial"), 600);
       }
     });
-    return onConfigChange(() => force(x => x + 1));
+    return onConfigChange(() => force((x) => x + 1));
   }, []);
 
   // Auto-collapse on mobile
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth < 768) { setLeftOpen(false); setRightOpen(false); }
+      if (window.innerWidth < 768) {
+        setLeftOpen(false);
+        setRightOpen(false);
+      }
     };
     onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const meta = e.metaKey || e.ctrlKey;
-      if (meta && e.key === "k") { e.preventDefault(); setDialog("search"); }
-      else if (meta && e.shiftKey && e.key.toLowerCase() === "z") { e.preventDefault(); redo(); }
-      else if (meta && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); }
-      else if (meta && e.key.toLowerCase() === "b") { e.preventDefault(); setLeftOpen(o => !o); }
-      else if (meta && e.key.toLowerCase() === "/") { e.preventDefault(); setRightOpen(o => !o); }
-      else if (e.key === "Escape") setDialog(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [undo, redo]);
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: "k", modifiers: ["ctrl"], handler: () => setDialog("search") },
+    { key: "z", modifiers: ["ctrl", "shift"], handler: () => redo() },
+    { key: "z", modifiers: ["ctrl"], handler: () => undo() },
+    { key: "b", modifiers: ["ctrl"], handler: () => setLeftOpen((o) => !o) },
+    { key: "/", modifiers: ["ctrl"], handler: () => setRightOpen((o) => !o) },
+    { key: "Escape", handler: () => setDialog(null) },
+  ]);
 
   const close = () => setDialog(null);
   const open = (k: DialogKey) => setDialog(k);
@@ -86,7 +104,11 @@ function Index() {
   return (
     <div className="dark h-screen flex flex-col overflow-hidden bg-background text-foreground">
       {getConfig().ui.backgroundAnim && <div className="bg-anim" aria-hidden />}
-      <TopBar onOpen={open} onToggleLeft={() => setLeftOpen(o => !o)} onToggleRight={() => setRightOpen(o => !o)} />
+      <TopBar
+        onOpen={open}
+        onToggleLeft={() => setLeftOpen((o) => !o)}
+        onToggleRight={() => setRightOpen((o) => !o)}
+      />
       <div className="flex-1 overflow-hidden">
         <PanelGroup orientation="horizontal" id="lpvt-h-layout">
           {leftOpen && (
@@ -99,15 +121,27 @@ function Index() {
           )}
           <Panel id="main" minSize="30%" collapsible={false}>
             <PanelGroup orientation="vertical" id="lpvt-v-layout">
-              <Panel id="tree" defaultSize={`${panelOpen ? 62 : 96}%`} minSize={`${panelOpen ? 62 : 96}%`} maxSize={`${panelOpen ? 62 : 96}%`} collapsible={false}>
+              <Panel
+                id="tree"
+                defaultSize={`${panelOpen ? 62 : 96}%`}
+                minSize={`${panelOpen ? 62 : 96}%`}
+                maxSize={`${panelOpen ? 62 : 96}%`}
+                collapsible={false}
+              >
                 <main className="h-full flex flex-col overflow-hidden bg-background relative">
                   <div className="flex-1 relative">
                     <FamilyTree />
                   </div>
                 </main>
               </Panel>
-              <Panel id="bottom" defaultSize={`${panelOpen ? 38 : 4}%`} minSize={`${panelOpen ? 38 : 4}%`} maxSize={`${panelOpen ? 38 : 4}%`} collapsible={false}>
-                <PermissionsPanel collapsed={!panelOpen} onToggle={() => setPanelOpen(o => !o)} />
+              <Panel
+                id="bottom"
+                defaultSize={`${panelOpen ? 38 : 4}%`}
+                minSize={`${panelOpen ? 38 : 4}%`}
+                maxSize={`${panelOpen ? 38 : 4}%`}
+                collapsible={false}
+              >
+                <PermissionsPanel collapsed={!panelOpen} onToggle={() => setPanelOpen((o) => !o)} />
               </Panel>
             </PanelGroup>
           </Panel>
@@ -122,26 +156,86 @@ function Index() {
         </PanelGroup>
       </div>
       <div className="h-6 border-t border-border bg-titlebar/90 glass flex items-center px-3 gap-4 text-[10px] font-mono text-muted-foreground select-none">
-        <span className="flex items-center gap-1.5"><Shield className="w-3 h-3 text-primary" />{groups.length} groups</span>
-        <span className="flex items-center gap-1.5"><Users className="w-3 h-3 text-info" />{users.length} users</span>
-        <span className="hidden sm:flex items-center gap-1.5"><GitBranch className="w-3 h-3 text-warning" />{groups.reduce((s, g) => s + g.parents.length, 0)} links</span>
-        <span className="hidden md:flex items-center gap-1.5"><Database className="w-3 h-3 text-info" />{groups.reduce((s, g) => s + g.permissions.length, 0) + users.reduce((s, u) => s + u.permissions.length, 0)} perms</span>
+        <span className="flex items-center gap-1.5">
+          <Shield className="w-3 h-3 text-primary" />
+          {groups.length} groups
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Users className="w-3 h-3 text-info" />
+          {users.length} users
+        </span>
+        <span className="hidden sm:flex items-center gap-1.5">
+          <GitBranch className="w-3 h-3 text-warning" />
+          {groups.reduce((s, g) => s + g.parents.length, 0)} links
+        </span>
+        <span className="hidden md:flex items-center gap-1.5">
+          <Database className="w-3 h-3 text-info" />
+          {groups.reduce((s, g) => s + g.permissions.length, 0) +
+            users.reduce((s, u) => s + u.permissions.length, 0)}{" "}
+          perms
+        </span>
         <span className="ml-auto flex items-center gap-3">
-          {errors > 0 && <button onClick={() => setDialog("debugger")} className="flex items-center gap-1 text-destructive hover:underline"><AlertTriangle className="w-3 h-3" /> {errors} errors</button>}
-          {warnings > 0 && <button onClick={() => setDialog("debugger")} className="flex items-center gap-1 text-warning hover:underline"><AlertTriangle className="w-3 h-3" /> {warnings} warnings</button>}
-          {errors === 0 && warnings === 0 && <span className="flex items-center gap-1 text-success"><CheckCircle2 className="w-3 h-3" /> all clean</span>}
-          <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> auto-saved · v1.0</span>
+          {errors > 0 && (
+            <button
+              onClick={() => setDialog("debugger")}
+              className="flex items-center gap-1 text-destructive hover:underline"
+            >
+              <AlertTriangle className="w-3 h-3" /> {errors} errors
+            </button>
+          )}
+          {warnings > 0 && (
+            <button
+              onClick={() => setDialog("debugger")}
+              className="flex items-center gap-1 text-warning hover:underline"
+            >
+              <AlertTriangle className="w-3 h-3" /> {warnings} warnings
+            </button>
+          )}
+          {errors === 0 && warnings === 0 && (
+            <span className="flex items-center gap-1 text-success">
+              <CheckCircle2 className="w-3 h-3" /> all clean
+            </span>
+          )}
+          <span className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> auto-saved · v1.0
+          </span>
         </span>
       </div>
 
-      <SimulatorDialog open={dialog === "simulator"} onOpenChange={(o: boolean) => o ? setDialog("simulator") : close()} />
-      <PluginsDialog open={dialog === "plugins"} onOpenChange={(o: boolean) => o ? setDialog("plugins") : close()} />
-      <GraphDialog open={dialog === "graph"} onOpenChange={(o: boolean) => o ? setDialog("graph") : close()} />
-      <SearchDialog open={dialog === "search"} onOpenChange={(o: boolean) => o ? setDialog("search") : close()} />
-      <ConflictDebugger open={dialog === "debugger"} onOpenChange={(o: boolean) => o ? setDialog("debugger") : close()} />
-      <ImportExportDialog open={dialog === "import" || dialog === "export"} onOpenChange={(o: boolean) => !o && close()} mode={dialog === "export" ? "export" : "import"} />
-      <SettingsDialog open={dialog === "settings"} onOpenChange={(o: boolean) => o ? setDialog("settings") : close()} onTutorial={() => setDialog("tutorial")} />
-      <OnboardingDialog open={dialog === "tutorial"} onOpenChange={(o: boolean) => o ? setDialog("tutorial") : close()} />
+      <SimulatorDialog
+        open={dialog === "simulator"}
+        onOpenChange={(o: boolean) => (o ? setDialog("simulator") : close())}
+      />
+      <PluginsDialog
+        open={dialog === "plugins"}
+        onOpenChange={(o: boolean) => (o ? setDialog("plugins") : close())}
+      />
+      <GraphDialog
+        open={dialog === "graph"}
+        onOpenChange={(o: boolean) => (o ? setDialog("graph") : close())}
+      />
+      <SearchDialog
+        open={dialog === "search"}
+        onOpenChange={(o: boolean) => (o ? setDialog("search") : close())}
+      />
+      <ConflictDebugger
+        open={dialog === "debugger"}
+        onOpenChange={(o: boolean) => (o ? setDialog("debugger") : close())}
+      />
+      <ImportExportDialog
+        open={dialog === "import" || dialog === "export"}
+        onOpenChange={(o: boolean) => !o && close()}
+        mode={dialog === "export" ? "export" : "import"}
+      />
+      <SettingsDialog
+        open={dialog === "settings"}
+        onOpenChange={(o: boolean) => (o ? setDialog("settings") : close())}
+        onTutorial={() => setDialog("tutorial")}
+      />
+      <OnboardingDialog
+        open={dialog === "tutorial"}
+        onOpenChange={(o: boolean) => (o ? setDialog("tutorial") : close())}
+      />
       <PromptModalRoot />
       <Toaster theme="dark" position="bottom-right" richColors closeButton />
     </div>
@@ -150,8 +244,12 @@ function Index() {
 
 function ResizeBar({ vertical }: { vertical?: boolean } = {}) {
   return (
-    <PanelResizeHandle className={`group relative ${vertical ? "h-1 w-full" : "w-1 h-full"} bg-border/60 hover:bg-primary/60 transition-colors data-[resize-handle-active]:bg-primary`}>
-      <div className={`absolute ${vertical ? "h-5 -top-2 left-0 right-0" : "w-5 -left-2 top-0 bottom-0"} group-hover:bg-primary/5`} />
+    <PanelResizeHandle
+      className={`group relative ${vertical ? "h-1 w-full" : "w-1 h-full"} bg-border/60 hover:bg-primary/60 transition-colors data-[resize-handle-active]:bg-primary`}
+    >
+      <div
+        className={`absolute ${vertical ? "h-5 -top-2 left-0 right-0" : "w-5 -left-2 top-0 bottom-0"} group-hover:bg-primary/5`}
+      />
     </PanelResizeHandle>
   );
 }
